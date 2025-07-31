@@ -3,9 +3,9 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
 interface JobPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // This would be replaced with actual job fetching logic
@@ -27,7 +27,8 @@ async function getJob(id: string) {
 export async function generateMetadata({
   params,
 }: JobPageProps): Promise<Metadata> {
-  const job = await getJob(params.id);
+  const { id } = await params;
+  const job = await getJob(id);
 
   return {
     title: `${job.title} at ${job.company} - Remote React Jobs`,
@@ -47,7 +48,8 @@ export async function generateMetadata({
 }
 
 export default async function JobPage({ params }: JobPageProps) {
-  const job = await getJob(params.id);
+  const { id } = await params;
+  const job = await getJob(id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
