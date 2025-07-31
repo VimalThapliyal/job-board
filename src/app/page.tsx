@@ -50,28 +50,30 @@ function CountdownTimer() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-4 text-white text-center">
-      <div className="text-sm font-medium mb-2">Next Job Update In</div>
-      <div className="flex justify-center items-center gap-2">
-        <div className="bg-white/20 rounded-lg px-3 py-2 min-w-[60px]">
-          <div className="text-2xl font-bold">
+    <div className="bg-white/10 backdrop-blur-sm rounded-full p-3 mb-6 inline-block">
+      <div className="text-blue-100 text-sm font-medium mb-2">
+        Next job update in
+      </div>
+      <div className="flex items-center justify-center gap-1">
+        <div className="bg-white/20 rounded px-2 py-1 min-w-[40px] text-center">
+          <div className="text-lg font-bold text-white">
             {timeLeft.hours.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs opacity-80">Hours</div>
+          <div className="text-xs text-blue-100">h</div>
         </div>
-        <div className="text-2xl font-bold">:</div>
-        <div className="bg-white/20 rounded-lg px-3 py-2 min-w-[60px]">
-          <div className="text-2xl font-bold">
+        <div className="text-white font-bold">:</div>
+        <div className="bg-white/20 rounded px-2 py-1 min-w-[40px] text-center">
+          <div className="text-lg font-bold text-white">
             {timeLeft.minutes.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs opacity-80">Minutes</div>
+          <div className="text-xs text-blue-100">m</div>
         </div>
-        <div className="text-2xl font-bold">:</div>
-        <div className="bg-white/20 rounded-lg px-3 py-2 min-w-[60px]">
-          <div className="text-2xl font-bold">
+        <div className="text-white font-bold">:</div>
+        <div className="bg-white/20 rounded px-2 py-1 min-w-[40px] text-center">
+          <div className="text-lg font-bold text-white">
             {timeLeft.seconds.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs opacity-80">Seconds</div>
+          <div className="text-xs text-blue-100">s</div>
         </div>
       </div>
     </div>
@@ -262,6 +264,12 @@ export default function Home() {
               Discover the best React developer opportunities from top companies
               worldwide. Updated every 6 hours with fresh opportunities.
             </p>
+
+            {/* Countdown Timer above search bar */}
+            <div className="flex justify-center mb-6">
+              <CountdownTimer />
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 w-full max-w-2xl">
                 <SearchBar
@@ -281,10 +289,10 @@ export default function Home() {
         <div className="absolute bottom-10 left-1/4 w-8 h-8 bg-white/5 rounded-full animate-spin"></div>
       </div>
 
-      {/* Stats Section with Countdown Timer */}
+      {/* Stats Section */}
       <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">{jobs.length}</div>
               <div className="text-sm opacity-90">Active Jobs</div>
@@ -308,9 +316,6 @@ export default function Home() {
             <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">6h</div>
               <div className="text-sm opacity-90">Update Cycle</div>
-            </div>
-            <div className="md:col-span-1">
-              <CountdownTimer />
             </div>
           </div>
         </div>
