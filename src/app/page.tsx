@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import JobCard from "@/components/JobCard";
 import SearchBar from "@/components/SearchBar";
-import FilterBar from "@/components/FilterBar";
 import { Job } from "@/types/job";
 import Link from "next/link";
 
@@ -92,7 +91,6 @@ export default function Home() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedJobType, setSelectedJobType] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
@@ -101,61 +99,12 @@ export default function Home() {
     fetchJobs();
   }, []);
 
-  const filterJobs = useCallback(() => {
-    let filtered = jobs;
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (job) =>
-          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Location filter
-    if (locationFilter) {
-      filtered = filtered.filter((job) =>
-        job.location.toLowerCase().includes(locationFilter.toLowerCase())
-      );
-    }
-
-    // Job type filter
-    if (selectedJobType !== "all") {
-      filtered = filtered.filter((job) =>
-        job.type.toLowerCase().includes(selectedJobType.toLowerCase())
-      );
-    }
-
-    // Sort jobs
-    switch (sortBy) {
-      case "latest":
-        filtered = filtered.sort(
-          (a, b) =>
-            new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
-        );
-        break;
-      case "company":
-        filtered = filtered.sort((a, b) => a.company.localeCompare(b.company));
-        break;
-      case "title":
-        filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-    }
-
-    setFilteredJobs(filtered);
-  }, [jobs, searchTerm, locationFilter, selectedJobType, sortBy]);
-
-  useEffect(() => {
-    filterJobs();
-  }, [filterJobs]);
-
   const fetchJobs = async () => {
     try {
       const response = await fetch("/api/jobs");
       const data = await response.json();
       setJobs(data);
+      setFilteredJobs(data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -168,79 +117,84 @@ export default function Home() {
     const typeCounts: { [key: string]: number } = {};
     jobs.forEach((job) => {
       const type = job.type.toLowerCase();
-      if (type.includes("full"))
+      if (type.includes("full-time") || type.includes("full time")) {
         typeCounts["full-time"] = (typeCounts["full-time"] || 0) + 1;
-      else if (type.includes("part"))
+      } else if (type.includes("part-time") || type.includes("part time")) {
         typeCounts["part-time"] = (typeCounts["part-time"] || 0) + 1;
-      else if (type.includes("contract"))
+      } else if (type.includes("contract")) {
         typeCounts["contract"] = (typeCounts["contract"] || 0) + 1;
-      else if (type.includes("remote"))
-        typeCounts["remote"] = (typeCounts["remote"] || 0) + 1;
-      else typeCounts["other"] = (typeCounts["other"] || 0) + 1;
+      } else if (type.includes("internship")) {
+        typeCounts["internship"] = (typeCounts["internship"] || 0) + 1;
+      } else {
+        typeCounts["other"] = (typeCounts["other"] || 0) + 1;
+      }
     });
 
     return [
-      { id: "all", label: "All Types", count: jobs.length },
-      ...Object.entries(typeCounts).map(([id, count]) => ({
-        id,
-        label: id
-          .split("-")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" "),
+      { id: "all", label: "All Jobs", count: jobs.length },
+      ...Object.entries(typeCounts).map(([type, count]) => ({
+        id: type,
+        label: type.charAt(0).toUpperCase() + type.slice(1).replace("-", " "),
         count,
       })),
     ];
   };
 
-  // Generate locations from actual data
-  const generateLocations = () => {
-    const locationCounts: { [key: string]: number } = {};
-    jobs.forEach((job) => {
-      const location = job.location.toLowerCase();
-      if (location.includes("remote"))
-        locationCounts["Remote"] = (locationCounts["Remote"] || 0) + 1;
-      else if (location.includes("new york") || location.includes("nyc"))
-        locationCounts["New York"] = (locationCounts["New York"] || 0) + 1;
-      else if (location.includes("san francisco") || location.includes("sf"))
-        locationCounts["San Francisco"] =
-          (locationCounts["San Francisco"] || 0) + 1;
-      else if (location.includes("london"))
-        locationCounts["London"] = (locationCounts["London"] || 0) + 1;
-      else if (location.includes("toronto"))
-        locationCounts["Toronto"] = (locationCounts["Toronto"] || 0) + 1;
-      else if (location.includes("berlin"))
-        locationCounts["Berlin"] = (locationCounts["Berlin"] || 0) + 1;
-      else {
-        // Extract city from location (take first part before comma or parentheses)
-        const city = location.split(",")[0].split("(")[0].trim();
-        if (city) {
-          const cityKey = city.charAt(0).toUpperCase() + city.slice(1);
-          locationCounts[cityKey] = (locationCounts[cityKey] || 0) + 1;
-        }
+  const jobTypes = generateJobTypes();
+
+  const handleFooterLink = (filter: string) => {
+    if (filter === "Remote Jobs") {
+      setSelectedJobType("all");
+    } else if (filter === "Full Time") {
+      setSelectedJobType("full-time");
+    } else if (filter === "Contract") {
+      setSelectedJobType("contract");
+    }
+  };
+
+  const filterJobs = useCallback(() => {
+    let filtered = jobs;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (job) =>
+          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by job type
+    if (selectedJobType !== "all") {
+      filtered = filtered.filter((job) =>
+        job.type.toLowerCase().includes(selectedJobType.toLowerCase())
+      );
+    }
+
+    // Sort jobs
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "latest":
+          return (
+            new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
+          );
+        case "company":
+          return a.company.localeCompare(b.company);
+        case "title":
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
       }
     });
 
-    return Object.entries(locationCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 8)
-      .map(([location, count]) => ({ location, count }));
-  };
+    setFilteredJobs(filtered);
+  }, [jobs, searchTerm, selectedJobType, sortBy]);
 
-  const jobTypes = generateJobTypes();
-  const popularLocations = generateLocations();
-
-  const handleFooterLink = (filter: string) => {
-    if (filter === "remote") {
-      setLocationFilter("Remote");
-      setSelectedJobType("all");
-    } else if (filter === "full-time") {
-      setSelectedJobType("full-time");
-      setLocationFilter("");
-    } else if (filter === "contract") {
-      setSelectedJobType("contract");
-      setLocationFilter("");
-    }
-  };
+  useEffect(() => {
+    filterJobs();
+  }, [filterJobs]);
 
   if (loading) {
     return (
@@ -372,29 +326,6 @@ export default function Home() {
               </select>
             </div>
           </div>
-
-          {/* Location Filter */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Popular Locations
-            </h3>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {popularLocations.map((loc) => (
-                <button
-                  key={loc.location}
-                  onClick={() => setLocationFilter(loc.location)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                    locationFilter === loc.location
-                      ? "bg-blue-600 text-white shadow-lg transform scale-105"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
-                  }`}
-                >
-                  {loc.location} ({loc.count})
-                </button>
-              ))}
-            </div>
-            <FilterBar value={locationFilter} onChange={setLocationFilter} />
-          </div>
         </div>
 
         {/* Results Section */}
@@ -450,7 +381,7 @@ export default function Home() {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="https://twitter.com/intent/tweet?text=Check%20out%20these%20amazing%20remote%20React%20developer%20jobs!&url=https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app"
+                  href="https://twitter.com/intent/tweet?text=Check%20out%20these%20amazing%20remote%20React%20developer%20jobs!&url=https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
@@ -464,7 +395,7 @@ export default function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.linkedin.com/sharing/share-offsite/?url=https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app"
+                  href="https://www.linkedin.com/sharing/share-offsite/?url=https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
@@ -478,7 +409,7 @@ export default function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.facebook.com/sharer/sharer.php?u=https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app"
+                  href="https://www.facebook.com/sharer/sharer.php?u=https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
