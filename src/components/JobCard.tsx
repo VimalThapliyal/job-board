@@ -1,48 +1,78 @@
 "use client";
 
-import { Job } from "@/types/job";
 import { formatDistanceToNow } from "date-fns";
+import { Job } from "@/types/job";
 
 interface JobCardProps {
   job: Job;
 }
 
 export default function JobCard({ job }: JobCardProps) {
-  const formatDate = (dateString: string) => {
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch {
-      return "Recently";
-    }
+  const getJobTypeColor = (type: string) => {
+    const lowerType = type.toLowerCase();
+    if (lowerType.includes("full")) return "bg-green-100 text-green-800";
+    if (lowerType.includes("part")) return "bg-blue-100 text-blue-800";
+    if (lowerType.includes("contract")) return "bg-purple-100 text-purple-800";
+    if (lowerType.includes("remote")) return "bg-orange-100 text-orange-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const getSalaryColor = (salary?: string) => {
+    if (!salary) return "";
+    const amount = parseInt(salary.replace(/[^0-9]/g, ""));
+    if (amount >= 150000) return "text-green-600";
+    if (amount >= 100000) return "text-blue-600";
+    return "text-gray-600";
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
-      <div className="p-6">
-        {/* Header */}
+    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
+      {/* Header with gradient */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            {job.logo && (
+          <div className="flex-1">
+            <h3 className="text-xl font-bold mb-2 group-hover:text-yellow-200 transition-colors">
+              {job.title}
+            </h3>
+            <p className="text-blue-100 font-medium">{job.company}</p>
+          </div>
+          {job.logo && (
+            <div className="ml-4">
               <img
                 src={job.logo}
                 alt={`${job.company} logo`}
-                className="w-12 h-12 rounded-lg object-cover"
+                className="w-12 h-12 rounded-lg bg-white/20 p-2"
               />
-            )}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                {job.title}
-              </h3>
-              <p className="text-gray-600 font-medium">{job.company}</p>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Job Details */}
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center text-sm text-gray-600">
+        {/* Job type badge */}
+        <div className="flex items-center gap-2">
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${getJobTypeColor(
+              job.type
+            )}`}
+          >
+            {job.type}
+          </span>
+          {job.salary && (
+            <span
+              className={`text-sm font-semibold ${getSalaryColor(job.salary)}`}
+            >
+              💰 {job.salary}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {/* Location and posted date */}
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -60,12 +90,11 @@ export default function JobCard({ job }: JobCardProps) {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            {job.location}
+            <span className="font-medium">{job.location}</span>
           </div>
-
-          <div className="flex items-center text-sm text-gray-600">
+          <div className="flex items-center gap-1">
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -74,16 +103,49 @@ export default function JobCard({ job }: JobCardProps) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.861-8.96-2.545M21 13.255l-3.432-.388c-1.086-.123-2.082-.5-2.918-1.1M21 13.255l-3.432-.388c-1.086-.123-2.082-.5-2.918-1.1M21 13.255l-3.432-.388c-1.086-.123-2.082-.5-2.918-1.1"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            {job.type}
+            <span>
+              {formatDistanceToNow(new Date(job.postedDate), {
+                addSuffix: true,
+              })}
+            </span>
           </div>
+        </div>
 
-          {job.salary && (
-            <div className="flex items-center text-sm text-gray-600">
+        {/* Description */}
+        <p className="text-gray-700 mb-4 line-clamp-3 leading-relaxed">
+          {job.description}
+        </p>
+
+        {/* Skills/Tags */}
+        {job.skills && job.skills.length > 0 && (
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2">
+              {job.skills.slice(0, 3).map((skill, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                >
+                  {skill}
+                </span>
+              ))}
+              {job.skills.length > 3 && (
+                <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                  +{job.skills.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Experience level */}
+        {job.experience && (
+          <div className="mb-4">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
               <svg
-                className="w-4 h-4 mr-2"
+                className="w-3 h-3 mr-1"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -92,34 +154,27 @@ export default function JobCard({ job }: JobCardProps) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"
                 />
               </svg>
-              {job.salary}
-            </div>
-          )}
-        </div>
+              {job.experience}
+            </span>
+          </div>
+        )}
 
-        {/* Description */}
-        <p className="text-gray-700 text-sm line-clamp-3 mb-4">
-          {job.description}
-        </p>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">
-            Posted {formatDate(job.postedDate)}
-          </span>
-
+        {/* Apply button */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <a
             href={job.applyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             Apply Now
+          </a>
+          <button className="ml-3 p-3 text-gray-400 hover:text-blue-600 transition-colors">
             <svg
-              className="w-4 h-4 ml-2"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -128,12 +183,15 @@ export default function JobCard({ job }: JobCardProps) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
-          </a>
+          </button>
         </div>
       </div>
+
+      {/* Hover effect overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 to-purple-600/0 group-hover:from-blue-600/5 group-hover:to-purple-600/5 transition-all duration-300 pointer-events-none rounded-2xl"></div>
     </div>
   );
 }

@@ -1,66 +1,71 @@
 "use client";
 
 interface FilterBarProps {
-  location: string;
-  onLocationChange: (value: string) => void;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export default function FilterBar({
-  location,
-  onLocationChange,
-}: FilterBarProps) {
+export default function FilterBar({ value, onChange }: FilterBarProps) {
   const popularLocations = [
     "Remote",
-    "San Francisco",
     "New York",
+    "San Francisco",
     "London",
     "Berlin",
+    "Toronto",
   ];
 
   return (
-    <div className="mt-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium text-gray-700">
-          Filter by location:
-        </span>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-800">Location</h3>
 
-        {/* Popular location buttons */}
-        <div className="flex flex-wrap gap-2">
-          {popularLocations.map((loc) => (
-            <button
-              key={loc}
-              onClick={() => onLocationChange(location === loc ? "" : loc)}
-              className={`px-3 py-1 text-sm rounded-full border transition-colors duration-200 ${
-                location === loc
-                  ? "bg-blue-100 border-blue-300 text-blue-700"
-                  : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {loc}
-            </button>
-          ))}
-        </div>
-
-        {/* Custom location input */}
-        <div className="relative">
-          <input
-            type="text"
-            value={location}
-            onChange={(e) => onLocationChange(e.target.value)}
-            placeholder="Enter location..."
-            className="px-3 py-1 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        {/* Clear filters */}
-        {location && (
+      {/* Popular Locations */}
+      <div className="flex flex-wrap gap-2">
+        {popularLocations.map((location) => (
           <button
-            onClick={() => onLocationChange("")}
-            className="text-sm text-gray-500 hover:text-gray-700 underline"
+            key={location}
+            onClick={() => onChange(location)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+              value === location
+                ? "bg-blue-600 text-white shadow-lg transform scale-105"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+            }`}
           >
-            Clear filters
+            {location}
           </button>
-        )}
+        ))}
+      </div>
+
+      {/* Custom Location Input */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg
+            className="h-5 w-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </div>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Enter custom location..."
+          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
       </div>
     </div>
   );
