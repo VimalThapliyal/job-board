@@ -10,6 +10,7 @@
     "scrape": "tsx scripts/scrapers/job-api.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.1",
     "next": "15.4.5",
