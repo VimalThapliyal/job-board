@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { Job } from "@/types/job";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const dataPath = path.join(process.cwd(), "data", "jobs.json");
 

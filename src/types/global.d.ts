@@ -4,7 +4,7 @@ declare global {
       command: "config" | "event",
       targetId: string,
       config?: {
-        [key: string]: any;
+        [key: string]: string | number | boolean;
       }
     ) => void;
   }
