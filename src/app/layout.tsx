@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Remote React Developer Jobs",
     description: "Find your next remote React developer opportunity",
     type: "website",
-    url: "https://job-board-nyjoo8uew-vimalthapliyals-projects.vercel.app",
+    url: "https://job-board-judapxrqq-vimalthapliyals-projects.vercel.app",
     siteName: "Remote React Jobs",
   },
   twitter: {
@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics */}
+        {/* Google Analytics - Replace G-XXXXXXXXXX with your actual GA4 ID */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
           strategy="afterInteractive"

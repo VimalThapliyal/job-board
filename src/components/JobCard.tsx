@@ -164,7 +164,9 @@ export default function JobCard({ job }: JobCardProps) {
 
         {/* Apply Button */}
         <a
-          href={job.applyUrl}
+          href={`${job.applyUrl}${
+            job.applyUrl.includes("?") ? "&" : "?"
+          }utm_source=remote-react-jobs&utm_medium=job-board&utm_campaign=react-developer-jobs`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {
