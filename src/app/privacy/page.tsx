@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -256,12 +258,12 @@ export default function PrivacyPage() {
             </section>
 
             <div className="mt-12 pt-8 border-t border-gray-200">
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
               >
                 ← Back to Job Board
-              </a>
+              </Link>
             </div>
           </div>
         </div>
