@@ -162,16 +162,42 @@ export default function JobCard({ job }: JobCardProps) {
           </div>
         )}
 
+        {/* Apply Button */}
+        <a
+          href={job.applyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => {
+            // Track application clicks for analytics
+            if (typeof window !== "undefined" && window.gtag) {
+              window.gtag("event", "job_application", {
+                job_title: job.title,
+                company: job.company,
+                location: job.location,
+                job_type: job.type,
+              });
+            }
+          }}
+          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        >
+          Apply Now
+          <svg
+            className="w-4 h-4 ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
+
         {/* Apply button */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <a
-            href={job.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-center hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            Apply Now
-          </a>
           <button className="ml-3 p-3 text-gray-400 hover:text-blue-600 transition-colors">
             <svg
               className="w-5 h-5"

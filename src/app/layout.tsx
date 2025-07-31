@@ -1,78 +1,65 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "React Developer Jobs - Remote & Local Opportunities",
+  title: "Remote React Developer Jobs - Find Your Next Opportunity",
   description:
-    "Find the best React developer jobs from top companies. Browse remote and local opportunities with real-time job listings updated every 6 hours.",
+    "Discover the latest remote React developer jobs from top companies. Search, filter, and apply to React developer positions worldwide.",
   keywords:
-    "react developer jobs, react jobs, frontend developer, javascript jobs, remote jobs, tech jobs",
-  authors: [{ name: "Job Board Aggregator" }],
+    "react developer jobs, remote jobs, frontend developer, javascript jobs, react native jobs",
   openGraph: {
-    title: "React Developer Jobs - Remote & Local Opportunities",
-    description:
-      "Find the best React developer jobs from top companies. Browse remote and local opportunities with real-time job listings.",
+    title: "Remote React Developer Jobs",
+    description: "Find your next remote React developer opportunity",
     type: "website",
-    url: "https://job-board-nq9al8dq8-vimalthapliyals-projects.vercel.app",
+    url: "https://job-board-nyjoo8uew-vimalthapliyals-projects.vercel.app",
+    siteName: "Remote React Jobs",
   },
   twitter: {
     card: "summary_large_image",
-    title: "React Developer Jobs - Remote & Local Opportunities",
-    description: "Find the best React developer jobs from top companies.",
+    title: "Remote React Developer Jobs",
+    description: "Find your next remote React developer opportunity",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
-        <link
-          rel="canonical"
-          href="https://job-board-nq9al8dq8-vimalthapliyals-projects.vercel.app"
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+          strategy="afterInteractive"
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "React Developer Jobs",
-              description:
-                "Find the best React developer jobs from top companies",
-              url: "https://job-board-nq9al8dq8-vimalthapliyals-projects.vercel.app",
-              potentialAction: {
-                "@type": "SearchAction",
-                target:
-                  "https://job-board-nq9al8dq8-vimalthapliyals-projects.vercel.app?search={search_term_string}",
-                "query-input": "required name=search_term_string",
-              },
-            }),
-          }}
-        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX');
+          `}
+        </Script>
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={inter.className}>
         {children}
         <Analytics />
       </body>
