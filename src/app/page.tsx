@@ -6,6 +6,78 @@ import SearchBar from "@/components/SearchBar";
 import FilterBar from "@/components/FilterBar";
 import { Job } from "@/types/job";
 
+// Countdown Timer Component
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const nextUpdate = new Date();
+
+      // Set next update to the next 6-hour mark (00:00, 06:00, 12:00, 18:00)
+      const currentHour = now.getHours();
+      const nextHour = Math.ceil(currentHour / 6) * 6;
+      nextUpdate.setHours(nextHour, 0, 0, 0);
+
+      // If we're past the last 6-hour mark of the day, go to next day
+      if (nextHour >= 24) {
+        nextUpdate.setDate(nextUpdate.getDate() + 1);
+        nextUpdate.setHours(0, 0, 0, 0);
+      }
+
+      const difference = nextUpdate.getTime() - now.getTime();
+
+      if (difference > 0) {
+        const hours = Math.floor(difference / (1000 * 60 * 60));
+        const minutes = Math.floor(
+          (difference % (1000 * 60 * 60)) / (1000 * 60)
+        );
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        setTimeLeft({ hours, minutes, seconds });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-4 text-white text-center">
+      <div className="text-sm font-medium mb-2">Next Job Update In</div>
+      <div className="flex justify-center items-center gap-2">
+        <div className="bg-white/20 rounded-lg px-3 py-2 min-w-[60px]">
+          <div className="text-2xl font-bold">
+            {timeLeft.hours.toString().padStart(2, "0")}
+          </div>
+          <div className="text-xs opacity-80">Hours</div>
+        </div>
+        <div className="text-2xl font-bold">:</div>
+        <div className="bg-white/20 rounded-lg px-3 py-2 min-w-[60px]">
+          <div className="text-2xl font-bold">
+            {timeLeft.minutes.toString().padStart(2, "0")}
+          </div>
+          <div className="text-xs opacity-80">Minutes</div>
+        </div>
+        <div className="text-2xl font-bold">:</div>
+        <div className="bg-white/20 rounded-lg px-3 py-2 min-w-[60px]">
+          <div className="text-2xl font-bold">
+            {timeLeft.seconds.toString().padStart(2, "0")}
+          </div>
+          <div className="text-xs opacity-80">Seconds</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -209,10 +281,10 @@ export default function Home() {
         <div className="absolute bottom-10 left-1/4 w-8 h-8 bg-white/5 rounded-full animate-spin"></div>
       </div>
 
-      {/* Stats Section */}
+      {/* Stats Section with Countdown Timer */}
       <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-center">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">{jobs.length}</div>
               <div className="text-sm opacity-90">Active Jobs</div>
@@ -236,6 +308,9 @@ export default function Home() {
             <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">6h</div>
               <div className="text-sm opacity-90">Update Cycle</div>
+            </div>
+            <div className="md:col-span-1">
+              <CountdownTimer />
             </div>
           </div>
         </div>
