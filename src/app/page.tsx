@@ -6,7 +6,7 @@ import SearchBar from "@/components/SearchBar";
 import FilterBar from "@/components/FilterBar";
 import { Job } from "@/types/job";
 
-// Countdown Timer Component
+// Countdown Timer Component - Redesigned
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
@@ -50,31 +50,38 @@ function CountdownTimer() {
   }, []);
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-full p-3 mb-6 inline-block">
-      <div className="text-blue-100 text-sm font-medium mb-2">
-        Next job update in
+    <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm rounded-full px-6 py-3 border border-white/10">
+      <div className="flex items-center gap-1">
+        <svg
+          className="w-4 h-4 text-blue-200"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span className="text-blue-100 text-sm font-medium">Fresh jobs in</span>
       </div>
-      <div className="flex items-center justify-center gap-1">
-        <div className="bg-white/20 rounded px-2 py-1 min-w-[40px] text-center">
-          <div className="text-lg font-bold text-white">
-            {timeLeft.hours.toString().padStart(2, "0")}
-          </div>
-          <div className="text-xs text-blue-100">h</div>
-        </div>
-        <div className="text-white font-bold">:</div>
-        <div className="bg-white/20 rounded px-2 py-1 min-w-[40px] text-center">
-          <div className="text-lg font-bold text-white">
-            {timeLeft.minutes.toString().padStart(2, "0")}
-          </div>
-          <div className="text-xs text-blue-100">m</div>
-        </div>
-        <div className="text-white font-bold">:</div>
-        <div className="bg-white/20 rounded px-2 py-1 min-w-[40px] text-center">
-          <div className="text-lg font-bold text-white">
-            {timeLeft.seconds.toString().padStart(2, "0")}
-          </div>
-          <div className="text-xs text-blue-100">s</div>
-        </div>
+      <div className="flex items-center gap-1">
+        <span className="text-white font-bold text-lg">
+          {timeLeft.hours.toString().padStart(2, "0")}
+        </span>
+        <span className="text-blue-200 text-sm">h</span>
+        <span className="text-white font-bold mx-1">:</span>
+        <span className="text-white font-bold text-lg">
+          {timeLeft.minutes.toString().padStart(2, "0")}
+        </span>
+        <span className="text-blue-200 text-sm">m</span>
+        <span className="text-white font-bold mx-1">:</span>
+        <span className="text-white font-bold text-lg">
+          {timeLeft.seconds.toString().padStart(2, "0")}
+        </span>
+        <span className="text-blue-200 text-sm">s</span>
       </div>
     </div>
   );
@@ -265,8 +272,8 @@ export default function Home() {
               worldwide. Updated every 6 hours with fresh opportunities.
             </p>
 
-            {/* Countdown Timer above search bar */}
-            <div className="flex justify-center mb-6">
+            {/* Redesigned Countdown Timer */}
+            <div className="flex justify-center mb-8">
               <CountdownTimer />
             </div>
 
