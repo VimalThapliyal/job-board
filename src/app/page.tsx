@@ -450,7 +450,7 @@ export default function Home() {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="https://twitter.com/intent/tweet?text=Check%20out%20these%20amazing%20remote%20React%20developer%20jobs!&url=https://job-board-nyjoo8uew-vimalthapliyals-projects.vercel.app"
+                  href="https://twitter.com/intent/tweet?text=Check%20out%20these%20amazing%20remote%20React%20developer%20jobs!&url=https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
@@ -464,7 +464,7 @@ export default function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.linkedin.com/sharing/share-offsite/?url=https://job-board-nyjoo8uew-vimalthapliyals-projects.vercel.app"
+                  href="https://www.linkedin.com/sharing/share-offsite/?url=https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
@@ -478,7 +478,7 @@ export default function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.facebook.com/sharer/sharer.php?u=https://job-board-nyjoo8uew-vimalthapliyals-projects.vercel.app"
+                  href="https://www.facebook.com/sharer/sharer.php?u=https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"

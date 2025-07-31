@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
     },
     sitemap:
-      "https://job-board-nq9al8dq8-vimalthapliyals-projects.vercel.app/sitemap.xml",
+      "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app/sitemap.xml",
   };
 }

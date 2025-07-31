@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Remote React Developer Jobs",
     description: "Find your next remote React developer opportunity",
     type: "website",
-    url: "https://job-board-judapxrqq-vimalthapliyals-projects.vercel.app",
+    url: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app",
     siteName: "Remote React Jobs",
   },
   twitter: {
