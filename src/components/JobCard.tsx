@@ -12,8 +12,8 @@ export default function JobCard({ job }: JobCardProps) {
     const lowerType = type.toLowerCase();
     if (lowerType.includes("full")) return "bg-green-100 text-green-800";
     if (lowerType.includes("part")) return "bg-blue-100 text-blue-800";
-    if (lowerType.includes("contract")) return "bg-purple-100 text-purple-800";
-    if (lowerType.includes("remote")) return "bg-orange-100 text-orange-800";
+    if (lowerType.includes("contract")) return "bg-orange-100 text-orange-800";
+    if (lowerType.includes("remote")) return "bg-purple-100 text-purple-800";
     return "bg-gray-100 text-gray-800";
   };
 
@@ -27,11 +27,11 @@ export default function JobCard({ job }: JobCardProps) {
 
   return (
     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
-      {/* Header with gradient */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
+      {/* Header with subtle gradient */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-yellow-200 transition-colors">
+            <h3 className="text-xl font-bold mb-2 group-hover:text-blue-100 transition-colors">
               {job.title}
             </h3>
             <p className="text-blue-100 font-medium">{job.company}</p>
@@ -168,7 +168,7 @@ export default function JobCard({ job }: JobCardProps) {
             href={job.applyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-center hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             Apply Now
           </a>
@@ -191,7 +191,7 @@ export default function JobCard({ job }: JobCardProps) {
       </div>
 
       {/* Hover effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 to-purple-600/0 group-hover:from-blue-600/5 group-hover:to-purple-600/5 transition-all duration-300 pointer-events-none rounded-2xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 to-blue-700/0 group-hover:from-blue-600/5 group-hover:to-blue-700/5 transition-all duration-300 pointer-events-none rounded-2xl"></div>
     </div>
   );
 }

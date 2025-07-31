@@ -107,9 +107,22 @@ export default function Home() {
     },
   ];
 
+  const handleFooterLink = (filter: string) => {
+    if (filter === "remote") {
+      setLocationFilter("Remote");
+      setSelectedJobType("all");
+    } else if (filter === "full-time") {
+      setSelectedJobType("full-time");
+      setLocationFilter("");
+    } else if (filter === "contract") {
+      setSelectedJobType("contract");
+      setLocationFilter("");
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -123,17 +136,15 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700">
-        <div className="absolute inset-0 bg-black opacity-10"></div>
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800">
+        <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
               Find Your Dream
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
-                React Job
-              </span>
+              <span className="block text-blue-100">React Job</span>
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
               Discover the best React developer opportunities from top companies
@@ -152,27 +163,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Floating elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-bounce"></div>
-        <div className="absolute top-20 right-20 w-16 h-16 bg-white/10 rounded-full animate-pulse"></div>
-        <div className="absolute bottom-10 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-spin"></div>
+        {/* Subtle floating elements */}
+        <div className="absolute top-10 left-10 w-16 h-16 bg-white/5 rounded-full animate-bounce"></div>
+        <div className="absolute top-20 right-20 w-12 h-12 bg-white/5 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-10 left-1/4 w-8 h-8 bg-white/5 rounded-full animate-spin"></div>
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
+      <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">{jobs.length}</div>
               <div className="text-sm opacity-90">Active Jobs</div>
             </div>
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-4 text-white">
+            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">
                 {new Set(jobs.map((j) => j.company)).size}
               </div>
               <div className="text-sm opacity-90">Companies</div>
             </div>
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">
                 {
                   jobs.filter((j) =>
@@ -182,7 +193,7 @@ export default function Home() {
               </div>
               <div className="text-sm opacity-90">Remote Jobs</div>
             </div>
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-4 text-white">
+            <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold">6h</div>
               <div className="text-sm opacity-90">Update Cycle</div>
             </div>
@@ -277,24 +288,6 @@ export default function Home() {
             </div>
           )}
         </div>
-
-        {/* Newsletter Signup */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white">
-          <h3 className="text-2xl font-bold mb-4">Stay Updated</h3>
-          <p className="text-blue-100 mb-6">
-            Get notified about new React developer opportunities
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-white"
-            />
-            <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-              Subscribe
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Footer */}
@@ -309,22 +302,31 @@ export default function Home() {
               </p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <h4 className="text-lg font-semibold mb-4">Quick Filters</h4>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button
+                    onClick={() => handleFooterLink("remote")}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
                     Remote Jobs
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button
+                    onClick={() => handleFooterLink("full-time")}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
                     Full Time
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button
+                    onClick={() => handleFooterLink("contract")}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
                     Contract
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -343,7 +345,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 React Job Board. All rights reserved.</p>
+            <p>&copy; 2025 React Job Board. All rights reserved.</p>
           </div>
         </div>
       </footer>
