@@ -1,6 +1,10 @@
 import { Job } from "../../src/types/job";
 import * as fs from "fs";
 import * as path from "path";
+import * as dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config({ path: ".env.local" });
 
 class JobAPIService {
   private readonly API_KEY = process.env.RAPIDAPI_KEY || "";
@@ -13,8 +17,20 @@ class JobAPIService {
     const jobs: Job[] = [];
 
     try {
+      console.log("API Key:", this.API_KEY ? "Present" : "Missing");
+      console.log("API Key length:", this.API_KEY.length);
+
       // Use RapidAPI's JSearch (Indeed API) - more reliable than scraping
-      const response = await fetch(`${this.BASE_URL}/search`, {
+      const queryParams = new URLSearchParams({
+        query: searchTerm,
+        page: "1",
+        num_pages: "1",
+      });
+
+      const url = `${this.BASE_URL}/search?${queryParams}`;
+      console.log("Request URL:", url);
+
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           "X-RapidAPI-Key": this.API_KEY,
@@ -22,7 +38,15 @@ class JobAPIService {
         },
       });
 
+      console.log("Response status:", response.status);
+      console.log(
+        "Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log("Error response:", errorText);
         throw new Error(`API request failed: ${response.status}`);
       }
 
