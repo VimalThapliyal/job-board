@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import JobCard from "@/components/JobCard";
 import SearchBar from "@/components/SearchBar";
 import FilterBar from "@/components/FilterBar";
@@ -19,23 +19,7 @@ export default function Home() {
     fetchJobs();
   }, []);
 
-  useEffect(() => {
-    filterJobs();
-  }, [jobs, searchTerm, locationFilter, selectedJobType, sortBy]);
-
-  const fetchJobs = async () => {
-    try {
-      const response = await fetch("/api/jobs");
-      const data = await response.json();
-      setJobs(data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching jobs:", error);
-      setLoading(false);
-    }
-  };
-
-  const filterJobs = () => {
+  const filterJobs = useCallback(() => {
     let filtered = jobs;
 
     // Search filter
@@ -79,6 +63,22 @@ export default function Home() {
     }
 
     setFilteredJobs(filtered);
+  }, [jobs, searchTerm, locationFilter, selectedJobType, sortBy]);
+
+  useEffect(() => {
+    filterJobs();
+  }, [filterJobs]);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch("/api/jobs");
+      const data = await response.json();
+      setJobs(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+      setLoading(false);
+    }
   };
 
   const jobTypes = [
@@ -249,7 +249,7 @@ export default function Home() {
             </h2>
             {searchTerm && (
               <div className="text-sm text-gray-600">
-                Showing results for "{searchTerm}"
+                Showing results for &quot;{searchTerm}&quot;
               </div>
             )}
           </div>
