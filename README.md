@@ -1,36 +1,201 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Job Board Aggregator
 
-## Getting Started
+A modern job board that aggregates React developer jobs from multiple sources, built with Next.js, TypeScript, and TailwindCSS.
 
-First, run the development server:
+## 🚀 Features
+
+- **Job Listings**: Browse React developer jobs with search and filtering
+- **Responsive Design**: Works perfectly on desktop and mobile
+- **Automated Scraping**: Jobs are automatically scraped every 6 hours
+- **SEO Optimized**: Built for search engine visibility
+- **Fast Performance**: Built with Next.js for optimal performance
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15 + React 19 + TypeScript
+- **Styling**: TailwindCSS
+- **Scraping**: Playwright
+- **Automation**: GitHub Actions
+- **Hosting**: Vercel (recommended)
+
+## 📋 Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Git
+
+## 🚀 Quick Start
+
+### 1. Clone and Install
+
+```bash
+git clone <your-repo-url>
+cd job-board
+npm install
+```
+
+### 2. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Test the Scraper (Optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run scrape
+```
 
-## Learn More
+This will run the Indeed scraper and save jobs to `data/jobs.json`.
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+job-board/
+├── src/
+│   ├── app/                 # Next.js app router
+│   │   ├── api/jobs/        # API routes
+│   │   └── page.tsx         # Homepage
+│   ├── components/          # React components
+│   │   ├── JobCard.tsx
+│   │   ├── SearchBar.tsx
+│   │   └── FilterBar.tsx
+│   └── types/              # TypeScript types
+│       └── job.ts
+├── scripts/
+│   └── scrapers/           # Scraping scripts
+│       └── indeed-scraper.ts
+├── data/                   # Scraped job data (auto-generated)
+└── .github/workflows/      # GitHub Actions
+    └── scrape-jobs.yml
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Configuration
 
-## Deploy on Vercel
+### Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create a `.env.local` file for local development:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+# Add any environment variables here
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+### Scraper Configuration
+
+The scraper is configured to search for "react developer" jobs in "remote" locations. You can modify the search terms in `scripts/scrapers/indeed-scraper.ts`.
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Deploy automatically
+
+### Manual Deployment
+
+```bash
+npm run build
+npm start
+```
+
+## 🤖 Automation
+
+The project includes GitHub Actions that:
+
+- **Scrapes jobs every 6 hours** automatically
+- **Commits updated job data** to the repository
+- **Can be triggered manually** via GitHub Actions UI
+
+### Manual Scraping
+
+```bash
+npm run scrape
+```
+
+## 📊 Data Flow
+
+1. **Scraping**: Playwright scrapes Indeed for React developer jobs
+2. **Storage**: Jobs are saved to `data/jobs.json`
+3. **API**: Next.js API routes serve the job data
+4. **Frontend**: React components display the jobs with search/filter
+
+## 🔍 SEO Features
+
+- Static job pages for each listing
+- Meta tags and schema markup
+- Sitemap generation
+- Optimized for search engines
+
+## 🎨 Customization
+
+### Adding New Job Sources
+
+1. Create a new scraper in `scripts/scrapers/`
+2. Follow the `IndeedScraper` pattern
+3. Add to the GitHub Actions workflow
+
+### Styling
+
+The app uses TailwindCSS. Modify `src/app/globals.css` for custom styles.
+
+### Job Data Structure
+
+Jobs follow this TypeScript interface:
+
+```typescript
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salary?: string;
+  description: string;
+  applyUrl: string;
+  postedDate: string;
+  logo?: string;
+}
+```
+
+## 🐛 Troubleshooting
+
+### Scraper Issues
+
+- Check if Indeed's structure has changed
+- Verify Playwright is installed: `npx playwright install`
+- Check network connectivity
+
+### Build Issues
+
+- Clear Next.js cache: `rm -rf .next`
+- Reinstall dependencies: `rm -rf node_modules && npm install`
+
+## 📈 Future Enhancements
+
+- [ ] Email job alerts
+- [ ] User authentication
+- [ ] Company dashboards
+- [ ] AI job matching
+- [ ] Multiple job categories
+- [ ] Monetization features
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+## 🙏 Acknowledgments
+
+- Built with Next.js and TailwindCSS
+- Job data scraped from Indeed
+- Automated with GitHub Actions
