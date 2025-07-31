@@ -81,31 +81,71 @@ export default function Home() {
     }
   };
 
-  const jobTypes = [
-    { id: "all", label: "All Types", count: jobs.length },
-    {
-      id: "full-time",
-      label: "Full Time",
-      count: jobs.filter((j) => j.type.toLowerCase().includes("full")).length,
-    },
-    {
-      id: "part-time",
-      label: "Part Time",
-      count: jobs.filter((j) => j.type.toLowerCase().includes("part")).length,
-    },
-    {
-      id: "contract",
-      label: "Contract",
-      count: jobs.filter((j) => j.type.toLowerCase().includes("contract"))
-        .length,
-    },
-    {
-      id: "remote",
-      label: "Remote",
-      count: jobs.filter((j) => j.location.toLowerCase().includes("remote"))
-        .length,
-    },
-  ];
+  // Generate job types from actual data
+  const generateJobTypes = () => {
+    const typeCounts: { [key: string]: number } = {};
+    jobs.forEach((job) => {
+      const type = job.type.toLowerCase();
+      if (type.includes("full"))
+        typeCounts["full-time"] = (typeCounts["full-time"] || 0) + 1;
+      else if (type.includes("part"))
+        typeCounts["part-time"] = (typeCounts["part-time"] || 0) + 1;
+      else if (type.includes("contract"))
+        typeCounts["contract"] = (typeCounts["contract"] || 0) + 1;
+      else if (type.includes("remote"))
+        typeCounts["remote"] = (typeCounts["remote"] || 0) + 1;
+      else typeCounts["other"] = (typeCounts["other"] || 0) + 1;
+    });
+
+    return [
+      { id: "all", label: "All Types", count: jobs.length },
+      ...Object.entries(typeCounts).map(([id, count]) => ({
+        id,
+        label: id
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" "),
+        count,
+      })),
+    ];
+  };
+
+  // Generate locations from actual data
+  const generateLocations = () => {
+    const locationCounts: { [key: string]: number } = {};
+    jobs.forEach((job) => {
+      const location = job.location.toLowerCase();
+      if (location.includes("remote"))
+        locationCounts["Remote"] = (locationCounts["Remote"] || 0) + 1;
+      else if (location.includes("new york") || location.includes("nyc"))
+        locationCounts["New York"] = (locationCounts["New York"] || 0) + 1;
+      else if (location.includes("san francisco") || location.includes("sf"))
+        locationCounts["San Francisco"] =
+          (locationCounts["San Francisco"] || 0) + 1;
+      else if (location.includes("london"))
+        locationCounts["London"] = (locationCounts["London"] || 0) + 1;
+      else if (location.includes("toronto"))
+        locationCounts["Toronto"] = (locationCounts["Toronto"] || 0) + 1;
+      else if (location.includes("berlin"))
+        locationCounts["Berlin"] = (locationCounts["Berlin"] || 0) + 1;
+      else {
+        // Extract city from location (take first part before comma or parentheses)
+        const city = location.split(",")[0].split("(")[0].trim();
+        if (city) {
+          const cityKey = city.charAt(0).toUpperCase() + city.slice(1);
+          locationCounts[cityKey] = (locationCounts[cityKey] || 0) + 1;
+        }
+      }
+    });
+
+    return Object.entries(locationCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+      .map(([location, count]) => ({ location, count }));
+  };
+
+  const jobTypes = generateJobTypes();
+  const popularLocations = generateLocations();
 
   const handleFooterLink = (filter: string) => {
     if (filter === "remote") {
@@ -151,12 +191,12 @@ export default function Home() {
               worldwide. Updated every 6 hours with fresh opportunities.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full p-1">
+              <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 w-full max-w-2xl">
                 <SearchBar
                   value={searchTerm}
                   onChange={setSearchTerm}
                   placeholder="Search jobs, companies, or skills..."
-                  className="w-full sm:w-96"
+                  className="w-full text-lg py-4"
                 />
               </div>
             </div>
@@ -247,6 +287,24 @@ export default function Home() {
 
           {/* Location Filter */}
           <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Popular Locations
+            </h3>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {popularLocations.map((loc) => (
+                <button
+                  key={loc.location}
+                  onClick={() => setLocationFilter(loc.location)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    locationFilter === loc.location
+                      ? "bg-blue-600 text-white shadow-lg transform scale-105"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+                  }`}
+                >
+                  {loc.location} ({loc.count})
+                </button>
+              ))}
+            </div>
             <FilterBar value={locationFilter} onChange={setLocationFilter} />
           </div>
         </div>
@@ -331,17 +389,25 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Contact</h4>
-              <p className="text-gray-400">
-                Questions? Reach out to us at
-                <br />
-                <a
-                  href="mailto:hello@reactjobboard.com"
-                  className="text-blue-400 hover:text-blue-300"
-                >
-                  hello@reactjobboard.com
-                </a>
-              </p>
+              <h4 className="text-lg font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <a
+                    href="/terms"
+                    className="hover:text-white transition-colors"
+                  >
+                    Terms & Conditions
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/privacy"
+                    className="hover:text-white transition-colors"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
