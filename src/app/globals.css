@@ -53,16 +53,6 @@
   transition-duration: 150ms;
 }
 
-/* Custom focus styles */
-.focus-ring {
-  outline: none;
-}
-
-.focus-ring:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.1);
-}
-
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(to right, #2563eb, #7c3aed);
