@@ -1,84 +1,89 @@
 import { Job } from "../../src/types/job";
-import * as fs from "fs";
-import * as path from "path";
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
+import {
+  saveJobsToDatabase,
+  isDatabaseAvailable,
+} from "../../src/lib/database";
 
 // Load environment variables
 dotenv.config({ path: ".env.local" });
 
 class JobAPIService {
-  private readonly API_KEY = process.env.RAPIDAPI_KEY || "";
-  private readonly BASE_URL = "https://jsearch.p.rapidapi.com";
+  private apiKey: string;
+  private baseUrl: string;
 
-  async fetchJobs(
-    searchTerm: string = "react developer",
-    location: string = "remote"
-  ): Promise<Job[]> {
-    const jobs: Job[] = [];
+  constructor() {
+    this.apiKey = process.env.RAPIDAPI_KEY || "";
+    this.baseUrl = "https://jsearch.p.rapidapi.com/search";
+  }
 
+  async fetchJobs(): Promise<Job[]> {
     try {
-      console.log("API Key:", this.API_KEY ? "Present" : "Missing");
-      console.log("API Key length:", this.API_KEY.length);
+      console.log("🔍 Fetching jobs from RapidAPI...");
 
-      // Use RapidAPI's JSearch (Indeed API) - more reliable than scraping
-      const queryParams = new URLSearchParams({
-        query: searchTerm,
-        page: "1",
-        num_pages: "1",
-      });
-
-      const url = `${this.BASE_URL}/search?${queryParams}`;
-      console.log("Request URL:", url);
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": this.API_KEY,
-          "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-        },
-      });
-
-      console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
+      const response = await fetch(
+        `${this.baseUrl}?query=react%20developer&page=1&num_pages=1&country=us`,
+        {
+          method: "GET",
+          headers: {
+            "X-RapidAPI-Key": this.apiKey,
+            "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
+          },
+        }
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Error response:", errorText);
         throw new Error(`API request failed: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log(`📊 Found ${data.data?.length || 0} jobs from API`);
 
-      if (data.data && Array.isArray(data.data)) {
-        data.data.forEach((jobData: any, index: number) => {
-          const job: Job = {
-            id: `api-${Date.now()}-${index}`,
-            title: jobData.job_title || "React Developer",
-            company: jobData.employer_name || "Company",
-            location: jobData.job_city || location,
-            type: jobData.job_employment_type || "Full-time",
-            salary: jobData.job_salary || undefined,
-            description: jobData.job_description || "No description available",
-            applyUrl: jobData.job_apply_link || "#",
-            postedDate:
-              jobData.job_posted_at_datetime_utc?.split("T")[0] ||
-              new Date().toISOString().split("T")[0],
-            logo: jobData.employer_logo || undefined,
-          };
-
-          jobs.push(job);
-        });
+      if (!data.data || !Array.isArray(data.data)) {
+        console.log("⚠️ No job data found, using sample data");
+        return this.getSampleJobs();
       }
+
+      return this.transformJobs(data.data);
     } catch (error) {
-      console.error("Error fetching jobs from API:", error);
-      // Fallback to sample data
+      console.error("❌ Error fetching jobs:", error);
+      console.log("🔄 Falling back to sample data");
       return this.getSampleJobs();
     }
+  }
 
-    return jobs;
+  private transformJobs(
+    apiJobs: Array<{
+      job_id?: string;
+      job_title?: string;
+      employer_name?: string;
+      job_city?: string;
+      job_employment_type?: string;
+      job_salary?: string;
+      job_description?: string;
+      job_apply_link?: string;
+      job_posted_at_datetime_utc?: string;
+      employer_logo?: string;
+    }>
+  ): Job[] {
+    return apiJobs.map((job, index) => ({
+      id: job.job_id || `job-${Date.now()}-${index}`,
+      title: job.job_title || "React Developer",
+      company: job.employer_name || "Company",
+      location: job.job_city || "Remote",
+      type: job.job_employment_type || "Full-time",
+      salary: job.job_salary || "Competitive salary",
+      description:
+        job.job_description || "We are looking for a React developer...",
+      applyUrl: job.job_apply_link || "https://example.com/apply",
+      postedDate:
+        job.job_posted_at_datetime_utc ||
+        new Date().toISOString().split("T")[0],
+      logo: job.employer_logo || "https://via.placeholder.com/50x50",
+      tags: ["React", "JavaScript", "Frontend"],
+      experience: "2+ years",
+      skills: ["React", "JavaScript", "TypeScript", "CSS", "HTML"],
+    }));
   }
 
   private getSampleJobs(): Job[] {
@@ -89,104 +94,133 @@ class JobAPIService {
         company: "TechCorp",
         location: "Remote",
         type: "Full-time",
-        salary: "$120k - $150k",
+        salary: "$100,000 - $150,000",
         description:
-          "We are looking for a senior React developer to join our team. You will be responsible for building scalable web applications and mentoring junior developers.",
-        applyUrl: "https://example.com/apply/1",
-        postedDate: "2024-01-15",
-        logo: "https://via.placeholder.com/50",
+          "We are looking for a senior React developer to join our team...",
+        applyUrl: "https://example.com/apply",
+        postedDate: "2025-01-15",
+        logo: "https://via.placeholder.com/50x50",
+        tags: ["React", "TypeScript", "Node.js"],
+        experience: "5+ years",
+        skills: ["React", "TypeScript", "Node.js", "AWS"],
       },
       {
         id: "sample-2",
-        title: "React Frontend Engineer",
+        title: "Frontend Developer (React)",
         company: "StartupXYZ",
         location: "San Francisco, CA",
         type: "Full-time",
-        salary: "$100k - $130k",
-        description:
-          "Join our fast-growing startup as a React frontend engineer. You will work on cutting-edge web applications and help shape our product.",
-        applyUrl: "https://example.com/apply/2",
-        postedDate: "2024-01-14",
-        logo: "https://via.placeholder.com/50",
+        salary: "$80,000 - $120,000",
+        description: "Join our fast-growing startup as a React developer...",
+        applyUrl: "https://example.com/apply",
+        postedDate: "2025-01-14",
+        logo: "https://via.placeholder.com/50x50",
+        tags: ["React", "JavaScript", "CSS"],
+        experience: "2+ years",
+        skills: ["React", "JavaScript", "CSS", "HTML"],
       },
       {
         id: "sample-3",
-        title: "React Developer",
-        company: "BigTech Inc",
+        title: "React Native Developer",
+        company: "MobileTech",
         location: "Remote",
         type: "Contract",
-        salary: "$80k - $100k",
+        salary: "$90,000 - $130,000",
         description:
-          "Contract position for React developer with 3+ years experience. You will work on various client projects and help deliver high-quality solutions.",
-        applyUrl: "https://example.com/apply/3",
-        postedDate: "2024-01-13",
-        logo: "https://via.placeholder.com/50",
+          "Looking for a React Native developer for mobile app development...",
+        applyUrl: "https://example.com/apply",
+        postedDate: "2025-01-13",
+        logo: "https://via.placeholder.com/50x50",
+        tags: ["React Native", "Mobile", "JavaScript"],
+        experience: "3+ years",
+        skills: [
+          "React Native",
+          "JavaScript",
+          "TypeScript",
+          "Mobile Development",
+        ],
       },
       {
         id: "sample-4",
         title: "Full Stack React Developer",
-        company: "Innovation Labs",
+        company: "WebSolutions",
         location: "New York, NY",
         type: "Full-time",
-        salary: "$110k - $140k",
+        salary: "$110,000 - $160,000",
         description:
-          "We are seeking a full stack React developer to join our innovation team. You will work on both frontend and backend development.",
-        applyUrl: "https://example.com/apply/4",
-        postedDate: "2024-01-12",
-        logo: "https://via.placeholder.com/50",
+          "Full stack developer with React and Node.js experience...",
+        applyUrl: "https://example.com/apply",
+        postedDate: "2025-01-12",
+        logo: "https://via.placeholder.com/50x50",
+        tags: ["React", "Node.js", "Full Stack"],
+        experience: "4+ years",
+        skills: ["React", "Node.js", "TypeScript", "MongoDB", "AWS"],
       },
       {
         id: "sample-5",
-        title: "React Native Developer",
-        company: "MobileFirst",
+        title: "React Developer (Entry Level)",
+        company: "JuniorTech",
         location: "Remote",
         type: "Full-time",
-        salary: "$90k - $120k",
+        salary: "$60,000 - $80,000",
         description:
-          "Join our mobile development team as a React Native developer. You will build cross-platform mobile applications.",
-        applyUrl: "https://example.com/apply/5",
-        postedDate: "2024-01-11",
-        logo: "https://via.placeholder.com/50",
+          "Entry level React developer position for recent graduates...",
+        applyUrl: "https://example.com/apply",
+        postedDate: "2025-01-11",
+        logo: "https://via.placeholder.com/50x50",
+        tags: ["React", "Entry Level", "JavaScript"],
+        experience: "0-2 years",
+        skills: ["React", "JavaScript", "CSS", "HTML"],
       },
     ];
   }
 
   async saveJobsToFile(jobs: Job[], filename: string = "jobs.json") {
-    const dataPath = path.join(process.cwd(), "data");
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
 
-    // Create data directory if it doesn't exist
-    if (!fs.existsSync(dataPath)) {
-      fs.mkdirSync(dataPath, { recursive: true });
+      const dataPath = path.join(process.cwd(), "data", filename);
+      const dataDir = path.dirname(dataPath);
+
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+
+      fs.writeFileSync(dataPath, JSON.stringify(jobs, null, 2));
+      console.log(`✅ Saved ${jobs.length} jobs to ${dataPath}`);
+    } catch (error) {
+      console.error("❌ Failed to save jobs to file:", error);
     }
+  }
 
-    const filePath = path.join(dataPath, filename);
-    fs.writeFileSync(filePath, JSON.stringify(jobs, null, 2));
-    console.log(`Jobs saved to: ${filePath}`);
+  async run() {
+    try {
+      console.log("🚀 Starting job scraping...");
+
+      const jobs = await this.fetchJobs();
+
+      // Check if database is available
+      const dbAvailable = await isDatabaseAvailable();
+
+      if (dbAvailable) {
+        // Save to database
+        await saveJobsToDatabase(jobs);
+        console.log("✅ Jobs saved to database");
+      } else {
+        // Save to file system
+        await this.saveJobsToFile(jobs);
+        console.log("✅ Jobs saved to file system");
+      }
+
+      console.log(`🎉 Successfully processed ${jobs.length} jobs`);
+    } catch (error) {
+      console.error("❌ Job scraping failed:", error);
+      process.exit(1);
+    }
   }
 }
 
-// Main execution function
-async function main() {
-  const apiService = new JobAPIService();
-
-  try {
-    console.log("Fetching jobs from API...");
-    const jobs = await apiService.fetchJobs("react developer", "remote");
-
-    console.log(`Fetched ${jobs.length} jobs`);
-
-    // Save jobs to file
-    await apiService.saveJobsToFile(jobs);
-
-    console.log("Job fetching completed successfully!");
-  } catch (error) {
-    console.error("Job fetching failed:", error);
-  }
-}
-
-// Run if this file is executed directly
-if (require.main === module) {
-  main().catch(console.error);
-}
-
-export default JobAPIService;
+// Run the scraper
+const scraper = new JobAPIService();
+scraper.run();

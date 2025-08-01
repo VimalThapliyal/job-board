@@ -154,6 +154,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <h1 className="text-xl font-semibold text-gray-900">
                 Admin Dashboard
               </h1>
+              {/* Admin Navigation */}
+              <nav className="ml-8 flex space-x-6">
+                <a
+                  href="/admin/subscriptions"
+                  className="text-gray-700 hover:text-blue-600 font-medium"
+                >
+                  Email Subscriptions
+                </a>
+                <a
+                  href="/admin/social-media"
+                  className="text-gray-700 hover:text-blue-600 font-medium"
+                >
+                  LinkedIn Automation
+                </a>
+              </nav>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">Welcome, Admin</span>
@@ -167,7 +182,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </div>
       </div>
-
       {/* Admin Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
