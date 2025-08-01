@@ -1,6 +1,6 @@
 [
   {
-    "id": "api-1754010235284-0",
+    "id": "api-1754029180262-0",
     "title": "React Developer",
     "company": "Go Intellects Inc",
     "location": "Washington",
@@ -11,7 +11,7 @@
     "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNVQCcHNvOWnHJfC0B7yenAHhbBeiszDqAV-6w&s=0"
   },
   {
-    "id": "api-1754010235284-1",
+    "id": "api-1754029180262-1",
     "title": "Junior Software Developer (Full Stack - Python, React)",
     "company": "Jobright.ai",
     "location": "Washington",
@@ -22,7 +22,7 @@
     "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc11c46XEF7nUag98qauGWM3tBuQH8ELcz8Cbg&s=0"
   },
   {
-    "id": "api-1754010235284-2",
+    "id": "api-1754029180262-2",
     "title": "React Developer",
     "company": "Go intellects Inc",
     "location": "Hillcrest Heights",
@@ -32,7 +32,7 @@
     "postedDate": "2025-07-31"
   },
   {
-    "id": "api-1754010235284-3",
+    "id": "api-1754029180262-3",
     "title": "AEM UI developer- React JS",
     "company": "Capgemini",
     "location": "Washington",
@@ -43,7 +43,7 @@
     "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5sgZoGfYI1XsIKjrk-ZrHWEbst6ThTBSeIZcL&s=0"
   },
   {
-    "id": "api-1754010235284-4",
+    "id": "api-1754029180262-4",
     "title": "React Software Developer – PostgreSQL AWS",
     "company": "Peraton",
     "location": "Washington",
@@ -54,7 +54,17 @@
     "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBOOXkmAgPSspVuh7SLtB570s8UdY-B1WvbTtL&s=0"
   },
   {
-    "id": "api-1754010235284-5",
+    "id": "api-1754029180262-5",
+    "title": "Senior Full Stack React Developer (On-Site)",
+    "company": "Lion Federal",
+    "location": "Falls Church",
+    "type": "Full-time",
+    "description": "Senior Full Stack React Developer\n\nJob Type: On-site, full-time\n\nCity: Falls Church\n\nState/Province: Virginia\n\nLion Federal is a dynamic and rapidly expanding tech company dedicated to delivering cutting-edge AI-powered solutions tailored for enterprise-level clients, including the U.S. Federal government.\n\nAt Lion Federal, we believe our team is the heartbeat of our success. We’ve built an environment where your growth is nurtured, and your voice truly matters. Here, you’ll enjoy all the benefits of a large company, along with some rare perks that set us apart:\n• Build genuine connections with team members at all levels\n• Get quick, meaningful responses from leadership who genuinely care\n• Feel a true sense of ownership, because your insights and feedback shape the future of our company\n\nWe are seeking a highly motivated and experienced Senior Full Stack React Developer to join our dynamic team in Falls Church, VA.\n\nPosition Summary:\n\nIn this role, you will be responsible for both front-end and back-end development, working on building a scalable and efficient platform for enterprise clients. You will collaborate closely with our API and AI development teams to ensure seamless integration and optimal performance. The ideal candidate should be self-driven and capable of delivering robust, high-quality code in a fast-paced environment.\n\nKey Responsibilities:\n• Lead the design, development, and deployment of full-stack web applications using React (front-end) and Node.js, Python, or other relevant back-end technologies.\n• Build and optimize APIs and services for performance, scalability, and security.\n• Collaborate with back-end and AI/ML teams to integrate APIs, databases, and AI-driven services.\n• Ensure the platform is scalable, secure, and optimized for performance, both on the front end and back end.\n• Write clean, maintainable, and well-documented code.\n• Participate in the full software development lifecycle, including code reviews, testing, and continuous deployment.\n• Take ownership of the product lifecycle, ensuring MVPs are delivered quickly to meet business deadlines.\n• Stay up-to-date with industry trends and emerging technologies to ensure our platform stays at the forefront of innovation.\n\nRequirements\n\nRequirements:\n• 5+ years of professional experience in full-stack development with a strong focus on React for front-end development.\n• Proficiency in front-end technologies like JavaScript/TypeScript, HTML5, CSS3, and state management libraries (Redux, Context API).\n• Expertise in back-end technologies like Node.js, Python, or similar, along with experience in building RESTful APIs.\n• Strong understanding of database systems (SQL, NoSQL) and cloud infrastructure (AWS, Azure, Google Cloud).\n• Familiarity with version control tools like Git and CI/CD pipelines.\n• Experience with containerization tools (Docker) and cloud deployment (Kubernetes) is a plus.\n• Excellent communication and problem-solving skills.\n• Self-starter with a passion for innovation and delivering high-quality products.\n\nNice-to-Haves:\n• Experience with AI/ML technologies, particularly Generative AI or LLMs.\n• Exposure to cloud platforms such as AWS, Azure, or Google Cloud.\n• Knowledge of DevOps practices and cloud infrastructure management.\n\nBenefits\n\nWhy Join Us?\n• Be a key player in building innovative AI-driven solutions for enterprise clients.\n• Collaborate with a team of experienced developers and AI experts.\n• Competitive salary and benefits package.\n• Opportunity to make a significant impact and shape the future of our product.\n\nBenefits:\n• Comprehensive CareFirst BCBS Medical, Dental, and Vision insurance fully covered for you and your family\n• Supportive team environment with outstanding leadership that values employee well-being\n• Generous paid time off, plus 11 paid holidays\n• 401(k) retirement plan with employer match\n• Performance-driven bonus program\n• Budget allocated for professional development and growth",
+    "applyUrl": "https://www.indeed.com/viewjob?jk=5f515c2eee9e24eb&utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic",
+    "postedDate": "2025-08-01"
+  },
+  {
+    "id": "api-1754029180262-6",
     "title": "Java Full Stack Developer with React-Focused. (Need Independent Candidate)",
     "company": "Jobs via Dice",
     "location": "Oakton",
@@ -65,17 +75,7 @@
     "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9CC1NlnLA7sshF1s1dqKvk8U495jsMwImnyPP&s=0"
   },
   {
-    "id": "api-1754010235284-6",
-    "title": "Senior Full Stack React Developer (On-Site)",
-    "company": "Lion Federal",
-    "location": "Falls Church",
-    "type": "Full-time",
-    "description": "Senior Full Stack React Developer\n\nJob Type: On-site, full-time\n\nCity: Falls Church\n\nState/Province: Virginia\n\nLion Federal is a dynamic and rapidly expanding tech company dedicated to delivering cutting-edge AI-powered solutions tailored for enterprise-level clients, including the U.S. Federal government.\n\nAt Lion Federal, we believe our team is the heartbeat of our success. We’ve built an environment where your growth is nurtured, and your voice truly matters. Here, you’ll enjoy all the benefits of a large company, along with some rare perks that set us apart:\n• Build genuine connections with team members at all levels\n• Get quick, meaningful responses from leadership who genuinely care\n• Feel a true sense of ownership, because your insights and feedback shape the future of our company\n\nWe are seeking a highly motivated and experienced Senior Full Stack React Developer to join our dynamic team in Falls Church, VA.\n\nPosition Summary:\n\nIn this role, you will be responsible for both front-end and back-end development, working on building a scalable and efficient platform for enterprise clients. You will collaborate closely with our API and AI development teams to ensure seamless integration and optimal performance. The ideal candidate should be self-driven and capable of delivering robust, high-quality code in a fast-paced environment.\n\nKey Responsibilities:\n• Lead the design, development, and deployment of full-stack web applications using React (front-end) and Node.js, Python, or other relevant back-end technologies.\n• Build and optimize APIs and services for performance, scalability, and security.\n• Collaborate with back-end and AI/ML teams to integrate APIs, databases, and AI-driven services.\n• Ensure the platform is scalable, secure, and optimized for performance, both on the front end and back end.\n• Write clean, maintainable, and well-documented code.\n• Participate in the full software development lifecycle, including code reviews, testing, and continuous deployment.\n• Take ownership of the product lifecycle, ensuring MVPs are delivered quickly to meet business deadlines.\n• Stay up-to-date with industry trends and emerging technologies to ensure our platform stays at the forefront of innovation.\n\nRequirements\n\nRequirements:\n• 5+ years of professional experience in full-stack development with a strong focus on React for front-end development.\n• Proficiency in front-end technologies like JavaScript/TypeScript, HTML5, CSS3, and state management libraries (Redux, Context API).\n• Expertise in back-end technologies like Node.js, Python, or similar, along with experience in building RESTful APIs.\n• Strong understanding of database systems (SQL, NoSQL) and cloud infrastructure (AWS, Azure, Google Cloud).\n• Familiarity with version control tools like Git and CI/CD pipelines.\n• Experience with containerization tools (Docker) and cloud deployment (Kubernetes) is a plus.\n• Excellent communication and problem-solving skills.\n• Self-starter with a passion for innovation and delivering high-quality products.\n\nNice-to-Haves:\n• Experience with AI/ML technologies, particularly Generative AI or LLMs.\n• Exposure to cloud platforms such as AWS, Azure, or Google Cloud.\n• Knowledge of DevOps practices and cloud infrastructure management.\n\nBenefits\n\nWhy Join Us?\n• Be a key player in building innovative AI-driven solutions for enterprise clients.\n• Collaborate with a team of experienced developers and AI experts.\n• Competitive salary and benefits package.\n• Opportunity to make a significant impact and shape the future of our product.\n\nBenefits:\n• Comprehensive CareFirst BCBS Medical, Dental, and Vision insurance fully covered for you and your family\n• Supportive team environment with outstanding leadership that values employee well-being\n• Generous paid time off, plus 11 paid holidays\n• 401(k) retirement plan with employer match\n• Performance-driven bonus program\n• Budget allocated for professional development and growth",
-    "applyUrl": "https://www.indeed.com/viewjob?jk=5f515c2eee9e24eb&utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic",
-    "postedDate": "2025-08-01"
-  },
-  {
-    "id": "api-1754010235284-7",
+    "id": "api-1754029180262-7",
     "title": "React Developer (Always Recruiting)",
     "company": "Dev Talent Network",
     "location": "Washington",
@@ -85,7 +85,7 @@
     "postedDate": "2025-08-01"
   },
   {
-    "id": "api-1754010235284-8",
+    "id": "api-1754029180262-8",
     "title": "Software Developer (Full Stack - Python, React)",
     "company": "US News & World Report ,L.P.",
     "location": "Washington",
@@ -96,7 +96,7 @@
     "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpL0KJMDNkimWIFiBMOAzLHq1yjyCBOWIgHwtz&s=0"
   },
   {
-    "id": "api-1754010235284-9",
+    "id": "api-1754029180262-9",
     "title": "Full Stack Application Developer (.NET, Azure, SQL, React, Node.js)",
     "company": "Ryder System",
     "location": "Washington",
