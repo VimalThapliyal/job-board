@@ -1,25 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 interface SearchBarProps {
-  onSearch: (term: string) => void;
+  value: string;
+  onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
 export default function SearchBar({
-  onSearch,
-  placeholder = "Search jobs, companies, or skills...",
+  value,
+  onChange,
+  placeholder = "Search...",
   className = "",
 }: SearchBarProps) {
-  const [value, setValue] = useState("");
-
-  const handleChange = (newValue: string) => {
-    setValue(newValue);
-    onSearch(newValue);
-  };
-
   return (
     <div className={`relative ${className}`}>
       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -40,7 +35,7 @@ export default function SearchBar({
       <input
         type="text"
         value={value}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-full bg-white/90 backdrop-blur-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-200"
       />
