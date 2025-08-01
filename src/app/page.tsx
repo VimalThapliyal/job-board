@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import JobCard from "@/components/JobCard";
 import SearchBar from "@/components/SearchBar";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { Job } from "@/types/job";
 import Link from "next/link";
 import Script from "next/script";
@@ -443,6 +444,11 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* Newsletter Signup Section */}
+          <div className="mb-8">
+            <NewsletterSignup />
+          </div>
         </div>
 
         {/* Footer */}
@@ -552,6 +558,14 @@ export default function Home() {
                       className="text-gray-300 hover:text-white transition-colors"
                     >
                       Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/admin/subscriptions"
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      Admin Dashboard
                     </Link>
                   </li>
                 </ul>
