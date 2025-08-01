@@ -2,11 +2,39 @@
 
 ## 🎯 Your Job Board URL
 
-**https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app**
+**https://job-board-nine-lyart.vercel.app**
 
 ---
 
 ## 📝 Post 1: Announcement Post (Main Feed)
+
+**Title:** 🚀 Just Launched: Remote React Developer Jobs Board
+
+**Content:**
+
+```
+Excited to share something I've been working on! 🎉
+
+I just launched a dedicated job board for Remote React Developer opportunities.
+
+🔍 What makes it special:
+• Real-time job updates every 6 hours
+• Curated remote React positions only
+• Clean, modern interface
+• Direct apply links to companies
+
+💼 Perfect for:
+• React developers looking for remote work
+• Frontend engineers wanting to specialize
+• JavaScript developers transitioning to React
+• Anyone seeking remote tech opportunities
+
+Check it out: https://job-board-nine-lyart.vercel.app
+
+Would love your feedback! What features would you like to see added?
+
+#ReactJobs #RemoteJobs #ReactDeveloper #JavaScript #TechJobs #RemoteWork #Frontend #WebDevelopment
+```
 
 ---
 
@@ -34,7 +62,7 @@ I built this job board specifically for React developers who want to work remote
 
 Whether you're a React veteran or just getting started, this could be your next opportunity.
 
-Explore here: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Explore here: https://job-board-nine-lyart.vercel.app
 
 What's your biggest challenge when looking for remote React jobs?
 
@@ -68,7 +96,7 @@ I created a job board specifically for React developers seeking remote opportuni
 
 This is a passion project to help fellow React developers find great remote opportunities.
 
-Check it out: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Check it out: https://job-board-nine-lyart.vercel.app
 
 Would love to hear what you think! Any suggestions for improvements?
 
@@ -100,7 +128,7 @@ I built a job board to track these trends and help developers find opportunities
 • Entry-level opportunities
 • Contract and full-time positions
 
-Explore the market: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Explore the market: https://job-board-nine-lyart.vercel.app
 
 What trends are you seeing in the React job market?
 
@@ -132,7 +160,7 @@ I know the struggle. That's why I built a dedicated job board for React develope
 • Real-time updates
 • Direct application links
 
-Check it out: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Check it out: https://job-board-nine-lyart.vercel.app
 
 What's your biggest pain point when job hunting?
 
@@ -168,7 +196,7 @@ I built a job board specifically for React developers seeking remote opportuniti
 🎯 The Goal:
 Help React developers find quality remote opportunities without the noise of generic job boards.
 
-Try it out: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Try it out: https://job-board-nine-lyart.vercel.app
 
 Would love feedback from the React community!
 
@@ -202,7 +230,7 @@ I've curated a job board with the best remote React developer positions:
 
 Don't let great opportunities pass you by!
 
-Explore here: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Explore here: https://job-board-nine-lyart.vercel.app
 
 Share with a React developer who might be looking! 🔄
 
@@ -236,7 +264,7 @@ Here are this week's most promising remote React developer opportunities:
 • Frontend engineers seeking growth
 • JavaScript developers transitioning to React
 
-Updated daily with fresh opportunities: https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app
+Updated daily with fresh opportunities: https://job-board-nine-lyart.vercel.app
 
 Which opportunity catches your eye?
 
