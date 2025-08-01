@@ -42,6 +42,50 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Structured data for the website
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Remote React Jobs",
+    description:
+      "Find the best remote React developer jobs from top companies worldwide",
+    url: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate:
+          "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app/?search={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Remote React Jobs",
+      url: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app",
+    },
+  };
+
+  // Organization structured data
+  const organizationStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Remote React Jobs",
+    url: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app",
+    description:
+      "Your go-to platform for finding the best remote React developer opportunities",
+    logo: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app/logo.png",
+    sameAs: [
+      "https://twitter.com/remotereactjobs",
+      "https://linkedin.com/company/remotereactjobs",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      availableLanguage: "English",
+    },
+  };
+
   return (
     <html lang="en">
       <head>
@@ -58,6 +102,22 @@ export default function RootLayout({
                    gtag('config', 'G-VKX0C6ZSXW');
                  `}
         </Script>
+
+        {/* Structured Data */}
+        <Script
+          id="structured-data-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteStructuredData),
+          }}
+        />
+        <Script
+          id="structured-data-organization"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationStructuredData),
+          }}
+        />
       </head>
       <body className={inter.className}>
         {children}
