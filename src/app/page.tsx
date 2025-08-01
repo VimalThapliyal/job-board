@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import JobCard from "@/components/JobCard";
 import SearchBar from "@/components/SearchBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
@@ -92,10 +92,15 @@ function CountdownTimer() {
 export default function Home() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [displayedJobs, setDisplayedJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [selectedJobType, setSelectedJobType] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
+  const [visibleCount, setVisibleCount] = useState(9);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
 
   // Breadcrumb structured data
   const breadcrumbStructuredData = {
@@ -157,11 +162,48 @@ export default function Home() {
       const data = await response.json();
       setJobs(data);
       setFilteredJobs(data);
+      setDisplayedJobs(data.slice(0, 9));
       setLoading(false);
     } catch (error) {
       console.error("Error fetching jobs:", error);
       setLoading(false);
     }
+  };
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          loadMoreJobs();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [filteredJobs, visibleCount, loadingMore]);
+
+  const loadMoreJobs = () => {
+    if (visibleCount >= filteredJobs.length) return;
+
+    setLoadingMore(true);
+    setTimeout(() => {
+      const newCount = Math.min(visibleCount + 9, filteredJobs.length);
+      setVisibleCount(newCount);
+      setDisplayedJobs(filteredJobs.slice(0, newCount));
+      setLoadingMore(false);
+    }, 500);
   };
 
   const generateJobTypes = () => {
@@ -251,6 +293,8 @@ export default function Home() {
     });
 
     setFilteredJobs(filtered);
+    setDisplayedJobs(filtered.slice(0, 9));
+    setVisibleCount(9);
   }, [jobs, searchTerm, selectedJobType, sortBy]);
 
   useEffect(() => {
@@ -432,16 +476,56 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredJobs.map((job) => (
+              <>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {displayedJobs.map((job) => (
+                    <div
+                      key={job.id}
+                      className="transform hover:scale-105 transition-all duration-300"
+                    >
+                      <JobCard job={job} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Infinite Scroll Loading */}
+                {visibleCount < filteredJobs.length && (
                   <div
-                    key={job.id}
-                    className="transform hover:scale-105 transition-all duration-300"
+                    ref={loadingRef}
+                    className="flex justify-center items-center py-8"
                   >
-                    <JobCard job={job} />
+                    {loadingMore ? (
+                      <div className="flex items-center gap-3">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                        <span className="text-gray-600">
+                          Loading more jobs...
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <p className="text-gray-500 text-sm">
+                          Scroll to load more jobs
+                        </p>
+                        <p className="text-gray-400 text-xs mt-1">
+                          Showing {visibleCount} of {filteredJobs.length} jobs
+                        </p>
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                )}
+
+                {/* End of results */}
+                {visibleCount >= filteredJobs.length &&
+                  filteredJobs.length > 0 && (
+                    <div className="text-center py-8">
+                      <div className="text-gray-400 text-4xl mb-2">✨</div>
+                      <p className="text-gray-500 text-sm">
+                        You&apos;ve reached the end! All {filteredJobs.length}{" "}
+                        jobs are displayed.
+                      </p>
+                    </div>
+                  )}
+              </>
             )}
           </div>
         </div>
