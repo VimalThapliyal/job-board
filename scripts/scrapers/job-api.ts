@@ -2,6 +2,7 @@ import { Job } from "../../src/types/job";
 import dotenv from "dotenv";
 import {
   saveJobsToDatabase,
+  addJobsToDatabase,
   isDatabaseAvailable,
 } from "../../src/lib/database";
 
@@ -17,12 +18,14 @@ class JobAPIService {
     this.baseUrl = "https://jsearch.p.rapidapi.com/search";
   }
 
-  async fetchJobs(): Promise<Job[]> {
+  async fetchJobs(page: number = 1, numPages: number = 3): Promise<Job[]> {
     try {
-      console.log("🔍 Fetching jobs from RapidAPI...");
+      console.log(
+        `🔍 Fetching jobs from RapidAPI (page ${page}, ${numPages} pages)...`
+      );
 
       const response = await fetch(
-        `${this.baseUrl}?query=react%20developer&page=1&num_pages=1&country=us`,
+        `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=${numPages}&country=us`,
         {
           method: "GET",
           headers: {
@@ -198,15 +201,16 @@ class JobAPIService {
     try {
       console.log("🚀 Starting job scraping...");
 
-      const jobs = await this.fetchJobs();
+      // Fetch multiple pages of jobs
+      const jobs = await this.fetchJobs(1, 3); // Fetch 3 pages (more jobs)
 
       // Check if database is available
       const dbAvailable = await isDatabaseAvailable();
 
       if (dbAvailable) {
-        // Save to database
-        await saveJobsToDatabase(jobs);
-        console.log("✅ Jobs saved to database");
+        // Add jobs to database (don't clear existing ones)
+        await addJobsToDatabase(jobs);
+        console.log("✅ Jobs added to database");
       } else {
         // Save to file system
         await this.saveJobsToFile(jobs);

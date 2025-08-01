@@ -9,30 +9,51 @@ import {
   isDatabaseAvailable,
 } from "@/lib/database";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "12");
+    const skip = (page - 1) * limit;
+
     // Check if database is available
     const dbAvailable = await isDatabaseAvailable();
 
     if (dbAvailable) {
-      // Use database
+      // Use database with pagination
       const jobs = await getJobsFromDatabase();
 
       // Clean up old jobs in background
       cleanupOldJobs().catch(console.error);
 
-      const response = NextResponse.json(jobs);
+      // Apply pagination
+      const totalJobs = jobs.length;
+      const totalPages = Math.ceil(totalJobs / limit);
+      const paginatedJobs = jobs.slice(skip, skip + limit);
+
+      const response = NextResponse.json({
+        jobs: paginatedJobs,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalJobs,
+          jobsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        },
+      });
+
       response.headers.set(
         "Cache-Control",
         "public, s-maxage=300, stale-while-revalidate=600"
       );
-      response.headers.set("X-Job-Count", jobs.length.toString());
+      response.headers.set("X-Job-Count", totalJobs.toString());
       response.headers.set("X-Last-Updated", new Date().toISOString());
       response.headers.set("X-Data-Source", "database");
 
       return response;
     } else {
-      // Fallback to file system
+      // Fallback to file system with pagination
       const dataPath = path.join(process.cwd(), "data", "jobs.json");
 
       if (fs.existsSync(dataPath)) {
@@ -41,12 +62,28 @@ export async function GET() {
           const jobs: Job[] = JSON.parse(fileContent);
           console.log(`Loaded ${jobs.length} jobs from data file`);
 
-          const response = NextResponse.json(jobs);
+          // Apply pagination
+          const totalJobs = jobs.length;
+          const totalPages = Math.ceil(totalJobs / limit);
+          const paginatedJobs = jobs.slice(skip, skip + limit);
+
+          const response = NextResponse.json({
+            jobs: paginatedJobs,
+            pagination: {
+              currentPage: page,
+              totalPages,
+              totalJobs,
+              jobsPerPage: limit,
+              hasNextPage: page < totalPages,
+              hasPrevPage: page > 1,
+            },
+          });
+
           response.headers.set(
             "Cache-Control",
             "public, s-maxage=300, stale-while-revalidate=600"
           );
-          response.headers.set("X-Job-Count", jobs.length.toString());
+          response.headers.set("X-Job-Count", totalJobs.toString());
           response.headers.set("X-Last-Updated", new Date().toISOString());
           response.headers.set("X-Data-Source", "file");
 
@@ -54,7 +91,7 @@ export async function GET() {
         }
       }
 
-      // Fallback to sample data
+      // Fallback to sample data with pagination
       const sampleJobs: Job[] = [
         {
           id: "sample-1",
@@ -91,9 +128,24 @@ export async function GET() {
 
       console.log("Using sample data (no database or jobs.json found)");
 
-      const response = NextResponse.json(sampleJobs);
+      const totalJobs = sampleJobs.length;
+      const totalPages = Math.ceil(totalJobs / limit);
+      const paginatedJobs = sampleJobs.slice(skip, skip + limit);
+
+      const response = NextResponse.json({
+        jobs: paginatedJobs,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalJobs,
+          jobsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        },
+      });
+
       response.headers.set("Cache-Control", "public, s-maxage=60");
-      response.headers.set("X-Job-Count", sampleJobs.length.toString());
+      response.headers.set("X-Job-Count", totalJobs.toString());
       response.headers.set("X-Data-Source", "sample");
 
       return response;

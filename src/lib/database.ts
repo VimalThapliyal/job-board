@@ -200,3 +200,27 @@ export async function isDatabaseAvailable(): Promise<boolean> {
     return false;
   }
 }
+
+// Add multiple jobs to database (without clearing existing ones)
+export async function addJobsToDatabase(jobs: Job[]): Promise<void> {
+  try {
+    const collection = await getJobsCollection();
+
+    // Add timestamp to each job
+    const jobsWithTimestamp = jobs.map((job) => ({
+      ...job,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    // Insert new jobs without clearing existing ones
+    if (jobsWithTimestamp.length > 0) {
+      await collection.insertMany(jobsWithTimestamp);
+    }
+
+    console.log(`✅ Added ${jobsWithTimestamp.length} jobs to database`);
+  } catch (error) {
+    console.error("❌ Failed to add jobs to database:", error);
+    throw error;
+  }
+}
