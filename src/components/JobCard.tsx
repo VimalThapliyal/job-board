@@ -26,6 +26,49 @@ export default function JobCard({ job }: JobCardProps) {
     return "text-gray-600";
   };
 
+  const isMeaningfulSalary = (salary?: string) => {
+    if (!salary) return false;
+
+    // List of generic phrases that don't provide useful salary information
+    const genericPhrases = [
+      "competitive salary",
+      "competitive",
+      "salary",
+      "competitive compensation",
+      "market rate",
+      "market competitive",
+      "attractive salary",
+      "excellent salary",
+      "great salary",
+      "good salary",
+      "fair salary",
+      "reasonable salary",
+      "salary commensurate",
+      "salary based on experience",
+      "salary depending on experience",
+      "salary to be discussed",
+      "salary negotiable",
+      "salary tbd",
+      "salary t.b.d.",
+      "salary to be determined",
+    ];
+
+    const lowerSalary = salary.toLowerCase().trim();
+
+    // Check if it's just a generic phrase
+    if (genericPhrases.some((phrase) => lowerSalary.includes(phrase))) {
+      return false;
+    }
+
+    // Check if it contains actual numbers (dollar amounts, ranges, etc.)
+    const hasNumbers = /\d/.test(salary);
+    const hasDollarSign = salary.includes("$");
+    const hasRange =
+      salary.includes("-") || salary.includes("to") || salary.includes("up to");
+
+    return hasNumbers && (hasDollarSign || hasRange);
+  };
+
   // Structured data for the job posting
   const jobStructuredData = {
     "@context": "https://schema.org",
@@ -132,7 +175,7 @@ export default function JobCard({ job }: JobCardProps) {
             >
               {job.type}
             </span>
-            {job.salary && (
+            {isMeaningfulSalary(job.salary) && (
               <span
                 className={`text-sm font-semibold ${getSalaryColor(
                   job.salary

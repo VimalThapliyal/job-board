@@ -66,24 +66,72 @@ class JobAPIService {
       employer_logo?: string;
     }>
   ): Job[] {
-    return apiJobs.map((job, index) => ({
-      id: job.job_id || `job-${Date.now()}-${index}`,
-      title: job.job_title || "React Developer",
-      company: job.employer_name || "Company",
-      location: job.job_city || "Remote",
-      type: job.job_employment_type || "Full-time",
-      salary: job.job_salary || "Competitive salary",
-      description:
-        job.job_description || "We are looking for a React developer...",
-      applyUrl: job.job_apply_link || "https://example.com/apply",
-      postedDate:
-        job.job_posted_at_datetime_utc ||
-        new Date().toISOString().split("T")[0],
-      logo: job.employer_logo || undefined,
-      tags: ["React", "JavaScript", "Frontend"],
-      experience: "2+ years",
-      skills: ["React", "JavaScript", "TypeScript", "CSS", "HTML"],
-    }));
+    return apiJobs.map((job, index) => {
+      // Check if salary is meaningful
+      const salary = job.job_salary;
+      const isMeaningfulSalary = (salary?: string) => {
+        if (!salary) return false;
+
+        const genericPhrases = [
+          "competitive salary",
+          "competitive",
+          "salary",
+          "competitive compensation",
+          "market rate",
+          "market competitive",
+          "attractive salary",
+          "excellent salary",
+          "great salary",
+          "good salary",
+          "fair salary",
+          "reasonable salary",
+          "salary commensurate",
+          "salary based on experience",
+          "salary depending on experience",
+          "salary to be discussed",
+          "salary negotiable",
+          "salary tbd",
+          "salary t.b.d.",
+          "salary to be determined",
+        ];
+
+        const lowerSalary = salary.toLowerCase().trim();
+
+        // Check if it's just a generic phrase
+        if (genericPhrases.some((phrase) => lowerSalary.includes(phrase))) {
+          return false;
+        }
+
+        // Check if it contains actual numbers (dollar amounts, ranges, etc.)
+        const hasNumbers = /\d/.test(salary);
+        const hasDollarSign = salary.includes("$");
+        const hasRange =
+          salary.includes("-") ||
+          salary.includes("to") ||
+          salary.includes("up to");
+
+        return hasNumbers && (hasDollarSign || hasRange);
+      };
+
+      return {
+        id: job.job_id || `job-${Date.now()}-${index}`,
+        title: job.job_title || "React Developer",
+        company: job.employer_name || "Company",
+        location: job.job_city || "Remote",
+        type: job.job_employment_type || "Full-time",
+        salary: isMeaningfulSalary(salary) ? salary : undefined,
+        description:
+          job.job_description || "We are looking for a React developer...",
+        applyUrl: job.job_apply_link || "https://example.com/apply",
+        postedDate:
+          job.job_posted_at_datetime_utc ||
+          new Date().toISOString().split("T")[0],
+        logo: job.employer_logo || undefined,
+        tags: ["React", "JavaScript", "Frontend"],
+        experience: "2+ years",
+        skills: ["React", "JavaScript", "TypeScript", "CSS", "HTML"],
+      };
+    });
   }
 
   private getSampleJobs(): Job[] {
