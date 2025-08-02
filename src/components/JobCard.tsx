@@ -20,10 +20,16 @@ export default function JobCard({ job }: JobCardProps) {
 
   const getSalaryColor = (salary?: string) => {
     if (!salary) return "";
-    const amount = parseInt(salary.replace(/[^0-9]/g, ""));
-    if (amount >= 150000) return "text-green-600";
-    if (amount >= 100000) return "text-blue-600";
-    return "text-gray-600";
+    try {
+      const amount = parseInt(salary.replace(/[^0-9]/g, ""));
+      if (isNaN(amount)) return "";
+      if (amount >= 150000) return "text-green-600";
+      if (amount >= 100000) return "text-blue-600";
+      return "text-gray-600";
+    } catch (error) {
+      console.warn("Error parsing salary:", salary, error);
+      return "";
+    }
   };
 
   const isMeaningfulSalary = (salary?: string) => {
@@ -103,7 +109,7 @@ export default function JobCard({ job }: JobCardProps) {
       ? {
           "@type": "MonetaryAmount",
           currency: "USD",
-          value: job.salary.replace(/[^0-9]/g, ""),
+          value: job.salary?.replace(/[^0-9]/g, "") || "0",
         }
       : undefined,
     qualifications: job.skills?.join(", "),

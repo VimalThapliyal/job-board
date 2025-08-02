@@ -136,7 +136,7 @@ export default function SubscriptionsPage() {
               .map(([type, count]) => (
                 <div key={type} className="flex items-center justify-between">
                   <span className="text-gray-700 capitalize">
-                    {type.replace("-", " ")}
+                    {type?.replace("-", " ") || type}
                   </span>
                   <div className="flex items-center">
                     <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
@@ -170,7 +170,7 @@ export default function SubscriptionsPage() {
                   className="flex items-center justify-between"
                 >
                   <span className="text-gray-700 capitalize">
-                    {location.replace("-", " ")}
+                    {location?.replace("-", " ") || location}
                   </span>
                   <div className="flex items-center">
                     <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
@@ -230,10 +230,12 @@ export default function SubscriptionsPage() {
                       {subscription.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {subscription.jobType.replace("-", " ")}
+                      {subscription.jobType?.replace("-", " ") ||
+                        subscription.jobType}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {subscription.location.replace("-", " ")}
+                      {subscription.location?.replace("-", " ") ||
+                        subscription.location}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(subscription.subscribedAt).toLocaleDateString()}
