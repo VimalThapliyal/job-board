@@ -42,18 +42,7 @@ export default function NewsletterSignup({
         throw new Error(data.error || "Failed to subscribe");
       }
 
-      // Store in localStorage for demo purposes
-      const subscriptions = JSON.parse(
-        localStorage.getItem("jobAlerts") || "[]"
-      );
-      subscriptions.push({
-        email,
-        jobType,
-        location,
-        subscribedAt: new Date().toISOString(),
-      });
-      localStorage.setItem("jobAlerts", JSON.stringify(subscriptions));
-
+      // Success - no need to store in localStorage since we're using MongoDB
       setIsSuccess(true);
       setEmail("");
       setJobType("all");

@@ -8,20 +8,40 @@ interface Subscription {
   jobType: string;
   location: string;
   subscribedAt: string;
+  isActive: boolean;
+  id?: string;
 }
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Load subscriptions from localStorage for demo
-    const stored = localStorage.getItem("jobAlerts");
-    if (stored) {
-      setSubscriptions(JSON.parse(stored));
-    }
-    setLoading(false);
+    fetchSubscriptions();
   }, []);
+
+  const fetchSubscriptions = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/admin/subscriptions");
+      if (!response.ok) {
+        throw new Error("Failed to fetch subscriptions");
+      }
+      const data = await response.json();
+      setSubscriptions(data.subscriptions || []);
+    } catch (error) {
+      console.error("Error fetching subscriptions:", error);
+      setError("Failed to load subscriptions");
+      // Fallback to localStorage for demo
+      const stored = localStorage.getItem("jobAlerts");
+      if (stored) {
+        setSubscriptions(JSON.parse(stored));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getJobTypeCounts = () => {
     const counts: Record<string, number> = {};

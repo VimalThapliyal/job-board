@@ -1,10 +1,19 @@
-import { Job } from "@/types/job";
 import { MongoClient, Db, Collection } from "mongodb";
+import { Job } from "@/types/job";
 
 interface DatabaseConfig {
   uri: string;
   dbName: string;
   collectionName: string;
+}
+
+interface EmailSubscription {
+  email: string;
+  jobType: string;
+  location: string;
+  subscribedAt: string;
+  isActive: boolean;
+  id?: string;
 }
 
 // Get database configuration dynamically
@@ -198,5 +207,104 @@ export async function isDatabaseAvailable(): Promise<boolean> {
   } catch (error) {
     console.log("❌ Database not available, will use file system");
     return false;
+  }
+}
+
+// Email Subscription Functions
+export async function getSubscriptionsCollection(): Promise<
+  Collection<EmailSubscription>
+> {
+  const db = await connectToDatabase();
+  return db.collection<EmailSubscription>("subscriptions");
+}
+
+export async function addEmailSubscription(
+  subscription: Omit<EmailSubscription, "id">
+): Promise<void> {
+  try {
+    const collection = await getSubscriptionsCollection();
+    const subscriptionWithId = {
+      ...subscription,
+      id: Math.random().toString(36).substr(2, 9),
+      isActive: true,
+    };
+
+    await collection.insertOne(subscriptionWithId);
+    console.log(`✅ Added email subscription for ${subscription.email}`);
+  } catch (error) {
+    console.error("❌ Failed to add email subscription:", error);
+    throw error;
+  }
+}
+
+export async function getEmailSubscriptions(): Promise<EmailSubscription[]> {
+  try {
+    const collection = await getSubscriptionsCollection();
+    const subscriptions = await collection.find({ isActive: true }).toArray();
+    console.log(`✅ Retrieved ${subscriptions.length} email subscriptions`);
+    return subscriptions;
+  } catch (error) {
+    console.error("❌ Failed to get email subscriptions:", error);
+    return [];
+  }
+}
+
+export async function getSubscriptionStats(): Promise<{
+  totalSubscriptions: number;
+  uniqueEmails: number;
+  jobTypeCounts: Record<string, number>;
+  locationCounts: Record<string, number>;
+}> {
+  try {
+    const subscriptions = await getEmailSubscriptions();
+    const uniqueEmails = new Set(subscriptions.map((s) => s.email)).size;
+
+    const jobTypeCounts: Record<string, number> = {};
+    const locationCounts: Record<string, number> = {};
+
+    subscriptions.forEach((sub) => {
+      jobTypeCounts[sub.jobType] = (jobTypeCounts[sub.jobType] || 0) + 1;
+      locationCounts[sub.location] = (locationCounts[sub.location] || 0) + 1;
+    });
+
+    return {
+      totalSubscriptions: subscriptions.length,
+      uniqueEmails,
+      jobTypeCounts,
+      locationCounts,
+    };
+  } catch (error) {
+    console.error("❌ Failed to get subscription stats:", error);
+    return {
+      totalSubscriptions: 0,
+      uniqueEmails: 0,
+      jobTypeCounts: {},
+      locationCounts: {},
+    };
+  }
+}
+
+export async function updateSubscriptionStatus(
+  email: string,
+  isActive: boolean
+): Promise<void> {
+  try {
+    const collection = await getSubscriptionsCollection();
+    await collection.updateMany({ email }, { $set: { isActive } });
+    console.log(`✅ Updated subscription status for ${email}`);
+  } catch (error) {
+    console.error("❌ Failed to update subscription status:", error);
+    throw error;
+  }
+}
+
+export async function deleteEmailSubscription(email: string): Promise<void> {
+  try {
+    const collection = await getSubscriptionsCollection();
+    await collection.deleteMany({ email });
+    console.log(`✅ Deleted email subscription for ${email}`);
+  } catch (error) {
+    console.error("❌ Failed to delete email subscription:", error);
+    throw error;
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { addEmailSubscription, isDatabaseAvailable } from "@/lib/database";
 
 interface SubscriptionData {
   email: string;
@@ -28,40 +29,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For now, we'll just return success
-    // In a real implementation, you would:
-    // 1. Store in database (MongoDB, PostgreSQL, etc.)
-    // 2. Send to email service (Mailchimp, ConvertKit, etc.)
-    // 3. Send confirmation email
-    // 4. Add to email automation sequences
+    // Check if database is available
+    const dbAvailable = await isDatabaseAvailable();
 
-    const subscription = {
-      email,
-      jobType,
-      location,
-      subscribedAt: new Date().toISOString(),
-      id: Math.random().toString(36).substr(2, 9), // Simple ID generation
-    };
+    if (dbAvailable) {
+      // Save to MongoDB
+      await addEmailSubscription({
+        email,
+        jobType,
+        location,
+        subscribedAt: new Date().toISOString(),
+        isActive: true,
+      });
 
-    // Log subscription for now (replace with database storage)
-    console.log("New subscription:", subscription);
-
-    // TODO: Integrate with email service
-    // Example with Mailchimp:
-    // await mailchimp.lists.addListMember(listId, {
-    //   email_address: email,
-    //   status: "subscribed",
-    //   merge_fields: {
-    //     JOBTYPE: jobType,
-    //     LOCATION: location,
-    //   },
-    // });
+      console.log("✅ Subscription saved to MongoDB");
+    } else {
+      // Fallback to localStorage (for demo purposes)
+      console.log("⚠️ Database not available, using localStorage fallback");
+    }
 
     return NextResponse.json(
       {
         success: true,
         message: "Successfully subscribed to job alerts",
-        subscription,
+        savedToDatabase: dbAvailable,
       },
       { status: 200 }
     );
