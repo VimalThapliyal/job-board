@@ -101,13 +101,24 @@ export default function JobCard({ job }: JobCardProps) {
               </h3>
               <p className="text-blue-100 font-medium">{job.company}</p>
             </div>
-            {job.logo && (
+            {job.logo ? (
               <div className="ml-4">
                 <img
                   src={job.logo}
                   alt={`${job.company} logo`}
                   className="w-12 h-12 rounded-lg bg-white/20 p-2"
+                  onError={(e) => {
+                    // Hide the image if it fails to load
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
                 />
+              </div>
+            ) : (
+              <div className="ml-4 w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
+                <span className="text-white font-bold text-lg">
+                  {job.company.charAt(0).toUpperCase()}
+                </span>
               </div>
             )}
           </div>
