@@ -129,7 +129,7 @@ export default function Home() {
     name: "React Developer Jobs",
     description: "Latest React developer job opportunities from top companies",
     numberOfItems: jobs.length,
-    itemListElement: jobs.slice(0, 10).map((job, index) => ({
+    itemListElement: jobs.slice(0, 20).map((job, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
