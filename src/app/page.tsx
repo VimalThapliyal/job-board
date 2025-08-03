@@ -98,7 +98,7 @@ export default function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedJobType, setSelectedJobType] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
-  const [visibleCount, setVisibleCount] = useState(9);
+  const [visibleCount, setVisibleCount] = useState(20); // Start with 20 instead of 9
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
@@ -162,7 +162,7 @@ export default function Home() {
       const data = await response.json();
       setJobs(data);
       setFilteredJobs(data);
-      setDisplayedJobs(data.slice(0, 9));
+      setDisplayedJobs(data.slice(0, 20)); // Show 20 jobs initially instead of 9
       setLoading(false);
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -199,7 +199,7 @@ export default function Home() {
 
     setLoadingMore(true);
     setTimeout(() => {
-      const newCount = Math.min(visibleCount + 9, filteredJobs.length);
+      const newCount = Math.min(visibleCount + 20, filteredJobs.length); // Load 20 more jobs at once
       setVisibleCount(newCount);
       setDisplayedJobs(filteredJobs.slice(0, newCount));
       setLoadingMore(false);
@@ -293,8 +293,8 @@ export default function Home() {
     });
 
     setFilteredJobs(filtered);
-    setDisplayedJobs(filtered.slice(0, 9));
-    setVisibleCount(9);
+    setDisplayedJobs(filtered.slice(0, 20)); // Show 20 jobs after filtering
+    setVisibleCount(20); // Reset to 20
   }, [jobs, searchTerm, selectedJobType, sortBy]);
 
   useEffect(() => {

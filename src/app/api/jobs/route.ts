@@ -4,7 +4,7 @@ import path from "path";
 import { Job } from "@/types/job";
 import {
   getJobsFromDatabase,
-  saveJobsToDatabase,
+  addJobsToDatabase,
   cleanupOldJobs,
   isDatabaseAvailable,
 } from "@/lib/database";
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
 
     if (dbAvailable) {
       // Save to database
-      await saveJobsToDatabase(jobs);
+      await addJobsToDatabase(jobs);
       console.log(`✅ Saved ${jobs.length} jobs to database`);
     } else {
       // Save to file system

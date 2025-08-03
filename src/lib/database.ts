@@ -53,7 +53,7 @@ export async function getJobsCollection(): Promise<Collection<Job>> {
   return database.collection<Job>(dbConfig.collectionName);
 }
 
-// Save jobs to database
+// Save jobs to database (incremental - adds new jobs without deleting existing ones)
 export async function saveJobsToDatabase(jobs: Job[]): Promise<void> {
   try {
     const collection = await getJobsCollection();
@@ -65,13 +65,21 @@ export async function saveJobsToDatabase(jobs: Job[]): Promise<void> {
       updatedAt: new Date(),
     }));
 
-    // Clear existing jobs and insert new ones
-    await collection.deleteMany({});
-    if (jobsWithTimestamp.length > 0) {
-      await collection.insertMany(jobsWithTimestamp);
+    // Get existing job IDs to avoid duplicates
+    const existingJobs = await collection.find({}, { projection: { id: 1 } }).toArray();
+    const existingJobIds = new Set(existingJobs.map(job => job.id));
+
+    // Filter out jobs that already exist
+    const newJobs = jobsWithTimestamp.filter(job => !existingJobIds.has(job.id));
+
+    if (newJobs.length > 0) {
+      await collection.insertMany(newJobs);
+      console.log(`✅ Added ${newJobs.length} new jobs to database`);
+    } else {
+      console.log("ℹ️ No new jobs to add (all jobs already exist)");
     }
 
-    console.log(`✅ Saved ${jobsWithTimestamp.length} jobs to database`);
+    console.log(`📊 Total jobs in database: ${await collection.countDocuments()}`);
   } catch (error) {
     console.error("❌ Failed to save jobs to database:", error);
     throw error;
@@ -108,10 +116,50 @@ export async function cleanupOldJobs(): Promise<void> {
   }
 }
 
+// Add multiple jobs to database (incremental)
+export async function addJobsToDatabase(jobs: Job[]): Promise<void> {
+  try {
+    const collection = await getJobsCollection();
+
+    // Get existing job IDs to avoid duplicates
+    const existingJobs = await collection.find({}, { projection: { id: 1 } }).toArray();
+    const existingJobIds = new Set(existingJobs.map(job => job.id));
+
+    // Filter out jobs that already exist and add timestamps
+    const newJobs = jobs
+      .filter(job => !existingJobIds.has(job.id))
+      .map(job => ({
+        ...job,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }));
+
+    if (newJobs.length > 0) {
+      await collection.insertMany(newJobs);
+      console.log(`✅ Added ${newJobs.length} new jobs to database`);
+    } else {
+      console.log("ℹ️ No new jobs to add (all jobs already exist)");
+    }
+
+    console.log(`📊 Total jobs in database: ${await collection.countDocuments()}`);
+  } catch (error) {
+    console.error("❌ Failed to add jobs to database:", error);
+    throw error;
+  }
+}
+
 // Add a single job to database
 export async function addJobToDatabase(job: Job): Promise<void> {
   try {
     const collection = await getJobsCollection();
+    
+    // Check if job already exists
+    const existingJob = await collection.findOne({ id: job.id });
+    if (existingJob) {
+      console.log(`ℹ️ Job ${job.id} already exists in database`);
+      return;
+    }
+
     const jobWithTimestamp = {
       ...job,
       createdAt: new Date(),

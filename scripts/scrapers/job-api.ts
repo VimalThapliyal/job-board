@@ -1,9 +1,6 @@
-import { Job } from "../../src/types/job";
+import { Job } from "@/types/job";
 import dotenv from "dotenv";
-import {
-  saveJobsToDatabase,
-  isDatabaseAvailable,
-} from "../../src/lib/database";
+import { isDatabaseAvailable, addJobsToDatabase } from "@/lib/database";
 
 // Load environment variables
 dotenv.config({ path: ".env.local" });
@@ -21,30 +18,46 @@ class JobAPIService {
     try {
       console.log("🔍 Fetching jobs from RapidAPI...");
 
-      const response = await fetch(
-        `${this.baseUrl}?query=react%20developer&page=1&num_pages=1&country=us`,
-        {
-          method: "GET",
-          headers: {
-            "X-RapidAPI-Key": this.apiKey,
-            "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-          },
-        }
-      );
+      // Fetch multiple pages to get more jobs
+      const allJobs: Job[] = [];
+      const maxPages = 3; // Fetch 3 pages instead of 1
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+      for (let page = 1; page <= maxPages; page++) {
+        console.log(`📄 Fetching page ${page}/${maxPages}...`);
+        
+        const response = await fetch(
+          `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=1&country=us`,
+          {
+            method: "GET",
+            headers: {
+              "X-RapidAPI-Key": this.apiKey,
+              "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          console.warn(`⚠️ API request failed for page ${page}: ${response.status}`);
+          continue;
+        }
+
+        const data = await response.json();
+        console.log(`📊 Found ${data.data?.length || 0} jobs from page ${page}`);
+
+        if (data.data && Array.isArray(data.data)) {
+          const transformedJobs = this.transformJobs(data.data);
+          allJobs.push(...transformedJobs);
+        }
       }
 
-      const data = await response.json();
-      console.log(`📊 Found ${data.data?.length || 0} jobs from API`);
+      console.log(`📊 Total jobs fetched: ${allJobs.length}`);
 
-      if (!data.data || !Array.isArray(data.data)) {
+      if (allJobs.length === 0) {
         console.log("⚠️ No job data found, using sample data");
         return this.getSampleJobs();
       }
 
-      return this.transformJobs(data.data);
+      return allJobs;
     } catch (error) {
       console.error("❌ Error fetching jobs:", error);
       console.log("🔄 Falling back to sample data");
@@ -253,7 +266,7 @@ class JobAPIService {
 
       if (dbAvailable) {
         // Save to database
-        await saveJobsToDatabase(jobs);
+        await addJobsToDatabase(jobs);
         console.log("✅ Jobs saved to database");
       } else {
         // Save to file system
