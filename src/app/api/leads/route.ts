@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveLeadToDatabase } from "@/lib/database";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,12 +44,12 @@ export async function POST(request: NextRequest) {
         const timestamp = Date.now();
         const sanitizedName = resume.name.replace(/[^a-zA-Z0-9.-]/g, "_");
         const fileName = `${timestamp}-${sanitizedName}`;
-        
+
         // For now, we'll store the file info but not the actual file
         // In production, you'd want to use a service like AWS S3, Cloudinary, or similar
         resumeUrl = `resume_${fileName}`;
         console.log(`📁 Resume info saved: ${resumeUrl}`);
-        
+
         // TODO: Implement proper file storage for production
         // For now, we'll just store the filename
       } catch (fileError) {
