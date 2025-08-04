@@ -11,12 +11,17 @@ import {
 
 export async function GET() {
   try {
+    console.log("🔍 API: Starting job fetch...");
+
     // Check if database is available
     const dbAvailable = await isDatabaseAvailable();
+    console.log(`🔍 API: Database available: ${dbAvailable}`);
 
     if (dbAvailable) {
       // Use database
+      console.log("🔍 API: Using database as data source");
       const jobs = await getJobsFromDatabase();
+      console.log(`🔍 API: Retrieved ${jobs.length} jobs from database`);
 
       // Clean up old jobs in background
       cleanupOldJobs().catch(console.error);
@@ -30,8 +35,10 @@ export async function GET() {
       response.headers.set("X-Last-Updated", new Date().toISOString());
       response.headers.set("X-Data-Source", "database");
 
+      console.log(`🔍 API: Returning ${jobs.length} jobs from database`);
       return response;
     } else {
+      console.log("🔍 API: Database not available, checking file system...");
       // Fallback to file system
       const dataPath = path.join(process.cwd(), "data", "jobs.json");
 
@@ -39,7 +46,7 @@ export async function GET() {
         const fileContent = fs.readFileSync(dataPath, "utf-8");
         if (fileContent.trim()) {
           const jobs: Job[] = JSON.parse(fileContent);
-          console.log(`Loaded ${jobs.length} jobs from data file`);
+          console.log(`🔍 API: Loaded ${jobs.length} jobs from data file`);
 
           const response = NextResponse.json(jobs);
           response.headers.set(
@@ -50,10 +57,12 @@ export async function GET() {
           response.headers.set("X-Last-Updated", new Date().toISOString());
           response.headers.set("X-Data-Source", "file");
 
+          console.log(`🔍 API: Returning ${jobs.length} jobs from file`);
           return response;
         }
       }
 
+      console.log("🔍 API: No file data found, using sample data");
       // Fallback to sample data
       const sampleJobs: Job[] = [
         {
@@ -89,17 +98,18 @@ export async function GET() {
         },
       ];
 
-      console.log("Using sample data (no database or jobs.json found)");
+      console.log("🔍 API: Using sample data (no database or jobs.json found)");
 
       const response = NextResponse.json(sampleJobs);
       response.headers.set("Cache-Control", "public, s-maxage=60");
       response.headers.set("X-Job-Count", sampleJobs.length.toString());
       response.headers.set("X-Data-Source", "sample");
 
+      console.log(`🔍 API: Returning ${sampleJobs.length} sample jobs`);
       return response;
     }
   } catch (error) {
-    console.error("Error loading jobs:", error);
+    console.error("❌ API: Error loading jobs:", error);
 
     const errorResponse = NextResponse.json(
       { error: "Failed to load jobs" },

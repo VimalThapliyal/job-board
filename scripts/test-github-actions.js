@@ -6,10 +6,20 @@ async function testGitHubActionsEnvironment() {
 
   // Test 1: Environment Variables
   console.log("📋 Environment Variables Check:");
-  console.log(`RAPIDAPI_KEY: ${process.env.RAPIDAPI_KEY ? "✅ Set" : "❌ Missing"}`);
-  console.log(`MONGODB_URI: ${process.env.MONGODB_URI ? "✅ Set" : "❌ Missing"}`);
-  console.log(`MONGODB_DB_NAME: ${process.env.MONGODB_DB_NAME ? "✅ Set" : "❌ Missing"}`);
-  console.log(`MONGODB_COLLECTION: ${process.env.MONGODB_COLLECTION ? "✅ Set" : "❌ Missing"}`);
+  console.log(
+    `RAPIDAPI_KEY: ${process.env.RAPIDAPI_KEY ? "✅ Set" : "❌ Missing"}`
+  );
+  console.log(
+    `MONGODB_URI: ${process.env.MONGODB_URI ? "✅ Set" : "❌ Missing"}`
+  );
+  console.log(
+    `MONGODB_DB_NAME: ${process.env.MONGODB_DB_NAME ? "✅ Set" : "❌ Missing"}`
+  );
+  console.log(
+    `MONGODB_COLLECTION: ${
+      process.env.MONGODB_COLLECTION ? "✅ Set" : "❌ Missing"
+    }`
+  );
 
   // Test 2: RapidAPI Connection
   console.log("\n🔌 Testing RapidAPI Connection...");
@@ -72,7 +82,6 @@ async function testGitHubActionsEnvironment() {
     // Clean up test document
     await collection.deleteOne({ id: testDoc.id });
     console.log("✅ MongoDB cleanup successful");
-
   } catch (error) {
     console.log(`❌ MongoDB error: ${error.message}`);
   } finally {
@@ -83,8 +92,12 @@ async function testGitHubActionsEnvironment() {
   console.log("\n📝 Testing Git Configuration...");
   try {
     const { execSync } = require("child_process");
-    const gitUser = execSync("git config user.name", { encoding: "utf8" }).trim();
-    const gitEmail = execSync("git config user.email", { encoding: "utf8" }).trim();
+    const gitUser = execSync("git config user.name", {
+      encoding: "utf8",
+    }).trim();
+    const gitEmail = execSync("git config user.email", {
+      encoding: "utf8",
+    }).trim();
     console.log(`Git User: ${gitUser}`);
     console.log(`Git Email: ${gitEmail}`);
     console.log("✅ Git configuration looks good");
@@ -95,4 +108,4 @@ async function testGitHubActionsEnvironment() {
   console.log("\n🎯 Test completed!");
 }
 
-testGitHubActionsEnvironment().catch(console.error); 
+testGitHubActionsEnvironment().catch(console.error);

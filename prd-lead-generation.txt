@@ -1,0 +1,403 @@
+# 🚀 Lead Generation System - Product Requirements Document
+
+## 📋 Executive Summary
+
+**Product Name:** Job Board Lead Generation System  
+**Version:** 1.0  
+**Date:** August 2024  
+**Status:** Planning Phase  
+
+### 🎯 Business Objective
+Transform the existing job board into a revenue-generating lead generation platform by capturing candidate applications and selling qualified leads to hiring companies.
+
+### 💰 Revenue Model
+- **Lead Fee:** $50-200 per qualified candidate
+- **Target Market:** Tech companies hiring React developers
+- **Revenue Goal:** $5,000-20,000/month within 6 months
+
+---
+
+## 🏗️ Technical Architecture
+
+### **Current Tech Stack:**
+- **Frontend:** Next.js 15.4.5 with TypeScript
+- **Backend:** Next.js API Routes
+- **Database:** MongoDB Atlas
+- **Deployment:** Vercel
+- **Job Data:** RapidAPI (JSearch)
+- **Automation:** GitHub Actions (every 6 hours)
+- **Styling:** TailwindCSS + DaisyUI
+
+### **New Components:**
+- **Lead Storage:** MongoDB collections for applications
+- **File Storage:** Vercel Blob for resumes
+- **Email Service:** Resend/SendGrid for company outreach
+- **Payment Processing:** Stripe for lead fees
+- **Analytics:** Vercel Analytics + custom tracking
+
+---
+
+## 📊 System Requirements
+
+### **Functional Requirements:**
+
+#### **1. Lead Capture System**
+- **Job Detail Pages:** Replace "Apply Now" with application forms
+- **Form Fields:** Name, email, phone, experience, resume, cover letter
+- **File Upload:** PDF, DOC, DOCX (max 5MB)
+- **Validation:** Required fields, email format, file type
+- **Success Flow:** Confirmation page, email to candidate
+
+#### **2. Lead Management Dashboard**
+- **Admin Panel:** View all leads, filter by status
+- **Lead Status:** New, Qualified, Contacted, Sold, Rejected
+- **Search & Filter:** By job, company, date, experience
+- **Export:** CSV for company outreach
+
+#### **3. Company Outreach System**
+- **Automated Emails:** Send leads to hiring companies
+- **Lead Qualification:** Experience match, skills alignment
+- **Pricing Tiers:** Based on job level and candidate quality
+- **Follow-up:** Automated reminders for unpaid leads
+
+#### **4. Payment Processing**
+- **Stripe Integration:** Handle lead payments
+- **Invoice Generation:** Automatic billing for companies
+- **Payment Tracking:** Revenue analytics and reporting
+
+### **Non-Functional Requirements:**
+
+#### **Performance:**
+- **Page Load:** < 2 seconds
+- **Form Submission:** < 3 seconds
+- **File Upload:** < 10 seconds for 5MB files
+- **Concurrent Users:** 100+ simultaneous applications
+
+#### **Security:**
+- **Data Encryption:** All personal data encrypted
+- **File Security:** Secure resume storage
+- **GDPR Compliance:** Data protection and privacy
+- **Access Control:** Admin-only lead management
+
+#### **Scalability:**
+- **Database:** MongoDB Atlas (auto-scaling)
+- **File Storage:** Vercel Blob (unlimited)
+- **Email:** Resend (10,000 emails/month)
+- **CDN:** Vercel Edge Network
+
+---
+
+## 🗄️ Database Schema
+
+### **Leads Collection:**
+```typescript
+interface Lead {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  company: string;
+  
+  // Candidate Info
+  name: string;
+  email: string;
+  phone?: string;
+  experience: string;
+  skills: string[];
+  
+  // Application
+  resumeUrl: string;
+  coverLetter?: string;
+  
+  // Status
+  status: 'new' | 'qualified' | 'contacted' | 'sold' | 'rejected';
+  qualificationScore: number; // 0-100
+  
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  ipAddress: string;
+  userAgent: string;
+}
+```
+
+### **Companies Collection:**
+```typescript
+interface Company {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  
+  // Billing
+  stripeCustomerId?: string;
+  leadPricing: {
+    junior: number; // $50
+    mid: number;    // $100
+    senior: number; // $150
+    lead: number;   // $200
+  };
+  
+  // Settings
+  autoPurchase: boolean;
+  maxBudget: number;
+  
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### **Transactions Collection:**
+```typescript
+interface Transaction {
+  id: string;
+  leadId: string;
+  companyId: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed';
+  stripePaymentId?: string;
+  
+  createdAt: Date;
+  completedAt?: Date;
+}
+```
+
+---
+
+## 🔄 User Flows
+
+### **Candidate Application Flow:**
+1. **Browse Jobs:** User finds job on job board
+2. **View Details:** Clicks on job to see full description
+3. **Apply:** Fills out application form
+4. **Upload Resume:** Attaches resume file
+5. **Submit:** Form validation and submission
+6. **Confirmation:** Success page and email confirmation
+
+### **Lead Processing Flow:**
+1. **New Lead:** Application submitted to database
+2. **Qualification:** Automated scoring based on experience/skills
+3. **Company Match:** Find relevant companies for the job
+4. **Outreach:** Send qualified leads to companies
+5. **Purchase:** Company buys lead
+6. **Payment:** Process payment via Stripe
+7. **Handoff:** Provide candidate contact to company
+
+### **Admin Management Flow:**
+1. **Dashboard:** View all leads and analytics
+2. **Qualification:** Manually review and score leads
+3. **Outreach:** Send leads to companies
+4. **Payment Tracking:** Monitor revenue and payments
+5. **Reporting:** Generate revenue and performance reports
+
+---
+
+## 🛠️ Technical Implementation
+
+### **Phase 1: Lead Capture (Week 1)**
+
+#### **1.1 Update Job Detail Pages**
+```typescript
+// src/app/jobs/[id]/page.tsx
+// Replace Apply Now button with application form
+```
+
+#### **1.2 Create Lead API**
+```typescript
+// src/app/api/leads/route.ts
+// Handle form submissions and file uploads
+```
+
+#### **1.3 File Upload System**
+```typescript
+// src/lib/file-upload.ts
+// Handle resume uploads to Vercel Blob
+```
+
+#### **1.4 Database Schema**
+```typescript
+// src/lib/database.ts
+// Add leads collection and functions
+```
+
+### **Phase 2: Lead Management (Week 2)**
+
+#### **2.1 Admin Dashboard**
+```typescript
+// src/app/admin/leads/page.tsx
+// Lead management interface
+```
+
+#### **2.2 Lead Qualification**
+```typescript
+// src/lib/lead-qualification.ts
+// Automated scoring algorithm
+```
+
+#### **2.3 Email Service**
+```typescript
+// src/lib/email-service.ts
+// Send leads to companies
+```
+
+### **Phase 3: Monetization (Week 3)**
+
+#### **3.1 Stripe Integration**
+```typescript
+// src/app/api/payments/route.ts
+// Handle lead purchases
+```
+
+#### **3.2 Company Outreach**
+```typescript
+// src/lib/company-outreach.ts
+// Automated company communication
+```
+
+#### **3.3 Analytics**
+```typescript
+// src/lib/analytics.ts
+// Revenue and performance tracking
+```
+
+---
+
+## 📈 Success Metrics
+
+### **Key Performance Indicators:**
+- **Lead Conversion Rate:** 20-30% of applications become qualified leads
+- **Lead Sale Rate:** 60-80% of qualified leads sold to companies
+- **Average Lead Price:** $75-150 per lead
+- **Monthly Revenue:** $5,000-20,000
+- **Customer Acquisition Cost:** < $50 per company
+- **Customer Lifetime Value:** $500-2,000 per company
+
+### **Technical Metrics:**
+- **Application Success Rate:** > 95%
+- **File Upload Success:** > 98%
+- **Email Delivery Rate:** > 95%
+- **Payment Success Rate:** > 90%
+- **System Uptime:** > 99.9%
+
+---
+
+## 🔒 Security & Compliance
+
+### **Data Protection:**
+- **Encryption:** All personal data encrypted at rest and in transit
+- **Access Control:** Role-based permissions for admin access
+- **Audit Trail:** Log all data access and modifications
+- **Data Retention:** 2-year retention for leads, 7 years for transactions
+
+### **GDPR Compliance:**
+- **Consent Management:** Clear consent for data processing
+- **Right to Erasure:** Allow candidates to delete their data
+- **Data Portability:** Export candidate data on request
+- **Privacy Policy:** Comprehensive privacy documentation
+
+### **Payment Security:**
+- **PCI Compliance:** Stripe handles all payment data
+- **Fraud Prevention:** Automated fraud detection
+- **Refund Policy:** Clear refund terms for companies
+
+---
+
+## 🚀 Deployment Strategy
+
+### **Environment Setup:**
+```bash
+# Production Environment Variables
+MONGODB_URI=mongodb+srv://...
+RAPIDAPI_KEY=...
+STRIPE_SECRET_KEY=...
+RESEND_API_KEY=...
+VERCEL_BLOB_READ_WRITE_TOKEN=...
+```
+
+### **Deployment Pipeline:**
+1. **Development:** Local testing with mock data
+2. **Staging:** Vercel preview deployments
+3. **Production:** Vercel production deployment
+4. **Monitoring:** Vercel Analytics + custom logging
+
+### **Backup Strategy:**
+- **Database:** MongoDB Atlas automated backups
+- **Files:** Vercel Blob redundancy
+- **Code:** GitHub repository with version control
+- **Configuration:** Environment variables in Vercel
+
+---
+
+## 💰 Revenue Projections
+
+### **Month 1-3: Foundation**
+- **Leads Generated:** 100-300/month
+- **Qualified Leads:** 20-60/month
+- **Revenue:** $1,000-5,000/month
+
+### **Month 4-6: Growth**
+- **Leads Generated:** 500-1,000/month
+- **Qualified Leads:** 100-200/month
+- **Revenue:** $5,000-15,000/month
+
+### **Month 7-12: Scale**
+- **Leads Generated:** 1,000-3,000/month
+- **Qualified Leads:** 200-600/month
+- **Revenue:** $15,000-50,000/month
+
+---
+
+## 🎯 Next Steps
+
+### **Immediate Actions (This Week):**
+1. **Update job detail pages** with application forms
+2. **Create lead storage system** in MongoDB
+3. **Build file upload functionality** with Vercel Blob
+4. **Set up email service** for confirmations
+
+### **Week 2:**
+1. **Build admin dashboard** for lead management
+2. **Implement lead qualification** algorithm
+3. **Create company outreach** system
+4. **Set up payment processing** with Stripe
+
+### **Week 3:**
+1. **Launch beta** with select companies
+2. **Gather feedback** and iterate
+3. **Scale outreach** to more companies
+4. **Optimize conversion** rates
+
+---
+
+## 📞 Support & Resources
+
+### **Technical Stack Documentation:**
+- **Next.js:** https://nextjs.org/docs
+- **MongoDB Atlas:** https://docs.atlas.mongodb.com
+- **Vercel:** https://vercel.com/docs
+- **Stripe:** https://stripe.com/docs
+- **Resend:** https://resend.com/docs
+
+### **Development Commands:**
+```bash
+# Development
+npm run dev
+
+# Build for production
+npm run build
+
+# Deploy to Vercel
+vercel --prod
+
+# Run lead generation tests
+npm run test:leads
+```
+
+---
+
+**Status:** Ready for Implementation  
+**Priority:** High  
+**Estimated Timeline:** 3 weeks  
+**Budget:** $500-1,000 for initial setup  
+
+This lead generation system will transform your job board into a profitable business while providing value to both candidates and companies. 🚀 

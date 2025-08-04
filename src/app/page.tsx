@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import JobCard from "@/components/JobCard";
 import SearchBar from "@/components/SearchBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Testimonials from "@/components/Testimonials";
 import { Job } from "@/types/job";
 import Link from "next/link";
 import Script from "next/script";
@@ -95,12 +98,10 @@ export default function Home() {
   const [displayedJobs, setDisplayedJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [selectedJobType, setSelectedJobType] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
-  const [visibleCount, setVisibleCount] = useState(20); // Start with 20 instead of 9
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(9); // Start with 9 jobs
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Breadcrumb structured data
   const breadcrumbStructuredData = {
@@ -162,7 +163,7 @@ export default function Home() {
       const data = await response.json();
       setJobs(data);
       setFilteredJobs(data);
-      setDisplayedJobs(data.slice(0, 20)); // Show 20 jobs initially instead of 9
+      setDisplayedJobs(data.slice(0, 9)); // Show 9 jobs initially
       setLoading(false);
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -170,36 +171,12 @@ export default function Home() {
     }
   };
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loadingMore) {
-          loadMoreJobs();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current);
-    }
-
-    observerRef.current = observer;
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [filteredJobs, visibleCount, loadingMore]);
-
   const loadMoreJobs = () => {
     if (visibleCount >= filteredJobs.length) return;
 
     setLoadingMore(true);
     setTimeout(() => {
-      const newCount = Math.min(visibleCount + 20, filteredJobs.length); // Load 20 more jobs at once
+      const newCount = Math.min(visibleCount + 9, filteredJobs.length); // Load 9 more jobs at once
       setVisibleCount(newCount);
       setDisplayedJobs(filteredJobs.slice(0, newCount));
       setLoadingMore(false);
@@ -293,8 +270,8 @@ export default function Home() {
     });
 
     setFilteredJobs(filtered);
-    setDisplayedJobs(filtered.slice(0, 20)); // Show 20 jobs after filtering
-    setVisibleCount(20); // Reset to 20
+    setDisplayedJobs(filtered.slice(0, 9)); // Show 9 jobs after filtering
+    setVisibleCount(9); // Reset to 9
   }, [jobs, searchTerm, selectedJobType, sortBy]);
 
   useEffect(() => {
@@ -334,6 +311,7 @@ export default function Home() {
         }}
       />
 
+      <Header />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800">
@@ -488,29 +466,28 @@ export default function Home() {
                   ))}
                 </div>
 
-                {/* Infinite Scroll Loading */}
+                {/* Load More Button */}
                 {visibleCount < filteredJobs.length && (
-                  <div
-                    ref={loadingRef}
-                    className="flex justify-center items-center py-8"
-                  >
-                    {loadingMore ? (
-                      <div className="flex items-center gap-3">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                        <span className="text-gray-600">
-                          Loading more jobs...
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <p className="text-gray-500 text-sm">
-                          Scroll to load more jobs
-                        </p>
-                        <p className="text-gray-400 text-xs mt-1">
-                          Showing {visibleCount} of {filteredJobs.length} jobs
-                        </p>
-                      </div>
-                    )}
+                  <div className="flex justify-center items-center py-8">
+                    <button
+                      onClick={loadMoreJobs}
+                      disabled={loadingMore}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none flex items-center gap-2"
+                    >
+                      {loadingMore ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          Load More Jobs
+                          <span className="text-sm opacity-75">
+                            ({filteredJobs.length - visibleCount} more)
+                          </span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 )}
 
@@ -530,6 +507,9 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Testimonials Section */}
+        <Testimonials />
+
         {/* Newsletter Signup Section - Full Width */}
         <div className="w-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -538,136 +518,7 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-12 mt-20">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              {/* Company Info */}
-              <div className="col-span-1 md:col-span-2">
-                <h3 className="text-xl font-bold mb-4">Remote React Jobs</h3>
-                <p className="text-gray-300 mb-4">
-                  Your go-to platform for finding the best remote React
-                  developer opportunities. Updated every 6 hours with fresh job
-                  listings from top companies worldwide.
-                </p>
-                <div className="flex space-x-4">
-                  <a
-                    href="https://twitter.com/intent/tweet?text=Check%20out%20these%20amazing%20remote%20React%20developer%20jobs!&url=https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-                    </svg>
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/sharing/share-offsite/?url=https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                    </svg>
-                  </a>
-                  <a
-                    href="https://www.facebook.com/sharer/sharer.php?u=https://job-board-hbz23cnlk-vimalthapliyals-projects.vercel.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-
-              {/* Quick Links */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-                <ul className="space-y-2">
-                  <li>
-                    <button
-                      onClick={() => handleFooterLink("Remote Jobs")}
-                      className="text-gray-300 hover:text-white transition-colors"
-                    >
-                      Remote Jobs
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleFooterLink("Full Time")}
-                      className="text-gray-300 hover:text-white transition-colors"
-                    >
-                      Full Time
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleFooterLink("Contract")}
-                      className="text-gray-300 hover:text-white transition-colors"
-                    >
-                      Contract
-                    </button>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Legal */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Legal</h4>
-                <ul className="space-y-2">
-                  <li>
-                    <Link
-                      href="/terms"
-                      className="text-gray-300 hover:text-white transition-colors"
-                    >
-                      Terms & Conditions
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/privacy"
-                      className="text-gray-300 hover:text-white transition-colors"
-                    >
-                      Privacy Policy
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/admin/subscriptions"
-                      className="text-gray-300 hover:text-white transition-colors"
-                    >
-                      Admin Dashboard
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-              <p className="text-gray-400">
-                © 2025 Remote React Jobs. All rights reserved. |
-                <span className="ml-2 text-gray-500">
-                  Jobs updated every 6 hours
-                </span>
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </>
   );

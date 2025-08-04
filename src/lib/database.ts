@@ -66,11 +66,15 @@ export async function saveJobsToDatabase(jobs: Job[]): Promise<void> {
     }));
 
     // Get existing job IDs to avoid duplicates
-    const existingJobs = await collection.find({}, { projection: { id: 1 } }).toArray();
-    const existingJobIds = new Set(existingJobs.map(job => job.id));
+    const existingJobs = await collection
+      .find({}, { projection: { id: 1 } })
+      .toArray();
+    const existingJobIds = new Set(existingJobs.map((job) => job.id));
 
     // Filter out jobs that already exist
-    const newJobs = jobsWithTimestamp.filter(job => !existingJobIds.has(job.id));
+    const newJobs = jobsWithTimestamp.filter(
+      (job) => !existingJobIds.has(job.id)
+    );
 
     if (newJobs.length > 0) {
       await collection.insertMany(newJobs);
@@ -79,7 +83,9 @@ export async function saveJobsToDatabase(jobs: Job[]): Promise<void> {
       console.log("ℹ️ No new jobs to add (all jobs already exist)");
     }
 
-    console.log(`📊 Total jobs in database: ${await collection.countDocuments()}`);
+    console.log(
+      `📊 Total jobs in database: ${await collection.countDocuments()}`
+    );
   } catch (error) {
     console.error("❌ Failed to save jobs to database:", error);
     throw error;
@@ -122,13 +128,15 @@ export async function addJobsToDatabase(jobs: Job[]): Promise<void> {
     const collection = await getJobsCollection();
 
     // Get existing job IDs to avoid duplicates
-    const existingJobs = await collection.find({}, { projection: { id: 1 } }).toArray();
-    const existingJobIds = new Set(existingJobs.map(job => job.id));
+    const existingJobs = await collection
+      .find({}, { projection: { id: 1 } })
+      .toArray();
+    const existingJobIds = new Set(existingJobs.map((job) => job.id));
 
     // Filter out jobs that already exist and add timestamps
     const newJobs = jobs
-      .filter(job => !existingJobIds.has(job.id))
-      .map(job => ({
+      .filter((job) => !existingJobIds.has(job.id))
+      .map((job) => ({
         ...job,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -141,7 +149,9 @@ export async function addJobsToDatabase(jobs: Job[]): Promise<void> {
       console.log("ℹ️ No new jobs to add (all jobs already exist)");
     }
 
-    console.log(`📊 Total jobs in database: ${await collection.countDocuments()}`);
+    console.log(
+      `📊 Total jobs in database: ${await collection.countDocuments()}`
+    );
   } catch (error) {
     console.error("❌ Failed to add jobs to database:", error);
     throw error;
@@ -152,7 +162,7 @@ export async function addJobsToDatabase(jobs: Job[]): Promise<void> {
 export async function addJobToDatabase(job: Job): Promise<void> {
   try {
     const collection = await getJobsCollection();
-    
+
     // Check if job already exists
     const existingJob = await collection.findOne({ id: job.id });
     if (existingJob) {
@@ -177,11 +187,16 @@ export async function addJobToDatabase(job: Job): Promise<void> {
 // Update a job in database
 export async function updateJobInDatabase(
   jobId: string,
-  updates: Partial<Job>
-): Promise<void> {
+  updates: {
+    title?: string;
+    company?: string;
+    description?: string;
+  }
+): Promise<boolean> {
   try {
     const collection = await getJobsCollection();
-    await collection.updateOne(
+
+    const result = await collection.updateOne(
       { id: jobId },
       {
         $set: {
@@ -190,10 +205,11 @@ export async function updateJobInDatabase(
         },
       }
     );
-    console.log(`✅ Updated job ${jobId} in database`);
+
+    return result.matchedCount > 0;
   } catch (error) {
-    console.error("❌ Failed to update job in database:", error);
-    throw error;
+    console.error("❌ Error updating job:", error);
+    return false;
   }
 }
 
@@ -354,5 +370,115 @@ export async function deleteEmailSubscription(email: string): Promise<void> {
   } catch (error) {
     console.error("❌ Failed to delete email subscription:", error);
     throw error;
+  }
+}
+
+// Lead interface
+interface Lead {
+  jobId: string;
+  jobTitle: string;
+  company: string;
+  name: string;
+  email: string;
+  phone: string;
+  experience: string;
+  coverLetter: string;
+  resumeUrl: string;
+  status: "new" | "qualified" | "contacted" | "sold" | "rejected";
+  qualificationScore: number;
+  createdAt: Date;
+  updatedAt: Date;
+  ipAddress: string;
+  userAgent: string;
+}
+
+// Save lead to database
+export async function saveLeadToDatabase(lead: Lead): Promise<void> {
+  try {
+    const collection = await getLeadsCollection();
+
+    // Check if lead already exists (same email for same job)
+    const existingLead = await collection.findOne({
+      email: lead.email,
+      jobId: lead.jobId,
+    });
+
+    if (existingLead) {
+      console.log(
+        `ℹ️ Lead already exists for ${lead.email} and job ${lead.jobId}`
+      );
+      return;
+    }
+
+    await collection.insertOne(lead);
+    console.log(
+      `✅ Lead saved: ${lead.name} for ${lead.jobTitle} at ${lead.company}`
+    );
+  } catch (error) {
+    console.error("❌ Failed to save lead to database:", error);
+    throw error;
+  }
+}
+
+// Get leads collection
+export async function getLeadsCollection(): Promise<Collection<Lead>> {
+  const database = await connectToDatabase();
+  return database.collection<Lead>("leads");
+}
+
+// Get all leads
+export async function getLeadsFromDatabase(): Promise<Lead[]> {
+  try {
+    const collection = await getLeadsCollection();
+    const leads = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    console.log(`✅ Retrieved ${leads.length} leads from database`);
+    return leads;
+  } catch (error) {
+    console.error("❌ Failed to get leads from database:", error);
+    return [];
+  }
+}
+
+// Get lead statistics
+export async function getLeadStats(): Promise<{
+  totalLeads: number;
+  newLeads: number;
+  qualifiedLeads: number;
+  soldLeads: number;
+  recentLeads: number;
+}> {
+  try {
+    const collection = await getLeadsCollection();
+
+    const totalLeads = await collection.countDocuments();
+    const newLeads = await collection.countDocuments({ status: "new" });
+    const qualifiedLeads = await collection.countDocuments({
+      status: "qualified",
+    });
+    const soldLeads = await collection.countDocuments({ status: "sold" });
+
+    // Recent leads (last 7 days)
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const recentLeads = await collection.countDocuments({
+      createdAt: { $gte: oneWeekAgo },
+    });
+
+    return {
+      totalLeads,
+      newLeads,
+      qualifiedLeads,
+      soldLeads,
+      recentLeads,
+    };
+  } catch (error) {
+    console.error("❌ Failed to get lead stats:", error);
+    return {
+      totalLeads: 0,
+      newLeads: 0,
+      qualifiedLeads: 0,
+      soldLeads: 0,
+      recentLeads: 0,
+    };
   }
 }
