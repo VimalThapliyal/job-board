@@ -35,9 +35,22 @@ const nextConfig: NextConfig = {
     ];
   },
   
-  // Performance optimizations
-  experimental: {
-    optimizeCss: true,
+  // Performance optimizations - removed experimental features that might cause build issues
+  // experimental: {
+  //   optimizeCss: true,
+  // },
+  
+  // Add webpack configuration for better compatibility
+  webpack: (config, { isServer }) => {
+    // Handle file uploads in API routes
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
+    return config;
   },
 };
 
