@@ -43,6 +43,10 @@ jobs:
           echo "MONGODB_COLLECTION=${{ secrets.MONGODB_COLLECTION }}" >> $GITHUB_ENV
         timeout-minutes: 1
 
+      - name: Test environment
+        run: node scripts/test-github-actions.js
+        timeout-minutes: 3
+
       - name: Run scraper
         run: npm run scrape
         timeout-minutes: 8
