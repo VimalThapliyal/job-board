@@ -41,26 +41,21 @@ export async function POST(request: NextRequest) {
     let resumeUrl = "";
     if (resume) {
       try {
-        // Create uploads directory if it doesn't exist
-        const uploadsDir = path.join(process.cwd(), "public", "uploads");
-        await mkdir(uploadsDir, { recursive: true });
-
-        // Generate unique filename
+        // For Vercel deployment, we'll store file info in the database
+        // and handle file storage separately or use a cloud storage service
         const timestamp = Date.now();
         const sanitizedName = resume.name.replace(/[^a-zA-Z0-9.-]/g, "_");
         const fileName = `${timestamp}-${sanitizedName}`;
-        const filePath = path.join(uploadsDir, fileName);
-
-        // Convert File to Buffer and save
-        const bytes = await resume.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        await writeFile(filePath, buffer);
-
-        // Store the public URL
-        resumeUrl = `/uploads/${fileName}`;
-        console.log(`📁 Resume saved: ${resumeUrl}`);
+        
+        // For now, we'll store the file info but not the actual file
+        // In production, you'd want to use a service like AWS S3, Cloudinary, or similar
+        resumeUrl = `resume_${fileName}`;
+        console.log(`📁 Resume info saved: ${resumeUrl}`);
+        
+        // TODO: Implement proper file storage for production
+        // For now, we'll just store the filename
       } catch (fileError) {
-        console.error("❌ Error saving resume:", fileError);
+        console.error("❌ Error processing resume:", fileError);
         // Continue without resume if there's an error
         resumeUrl = "error_uploading";
       }
