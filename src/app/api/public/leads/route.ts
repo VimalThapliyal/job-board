@@ -9,7 +9,7 @@ export async function GET() {
       success: true,
       count: leads.length,
       leads: leads.map((lead) => ({
-        id: lead._id,
+        id: (lead as any)._id || lead.jobId,
         name: lead.name,
         email: lead.email,
         jobTitle: lead.jobTitle,
