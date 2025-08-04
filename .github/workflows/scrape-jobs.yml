@@ -13,6 +13,7 @@ permissions:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Add timeout to prevent hanging
 
     steps:
       - name: Checkout code
@@ -28,9 +29,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        timeout-minutes: 5
 
       - name: Install dotenv
         run: npm install dotenv
+        timeout-minutes: 2
 
       - name: Set up environment variables
         run: |
@@ -38,14 +41,17 @@ jobs:
           echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
           echo "MONGODB_DB_NAME=${{ secrets.MONGODB_DB_NAME }}" >> $GITHUB_ENV
           echo "MONGODB_COLLECTION=${{ secrets.MONGODB_COLLECTION }}" >> $GITHUB_ENV
+        timeout-minutes: 1
 
       - name: Run scraper
         run: npm run scrape
+        timeout-minutes: 8
 
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+        timeout-minutes: 1
 
       - name: Commit and push changes
         run: |
@@ -56,3 +62,4 @@ jobs:
             git commit -m "Update job listings [skip ci]"
             git push
           fi
+        timeout-minutes: 3

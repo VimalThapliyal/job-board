@@ -25,28 +25,45 @@ class JobAPIService {
       for (let page = 1; page <= maxPages; page++) {
         console.log(`📄 Fetching page ${page}/${maxPages}...`);
         
-        const response = await fetch(
-          `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=1&country=us`,
-          {
-            method: "GET",
-            headers: {
-              "X-RapidAPI-Key": this.apiKey,
-              "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-            },
-          }
-        );
+        try {
+          const response = await fetch(
+            `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=1&country=us`,
+            {
+              method: "GET",
+              headers: {
+                "X-RapidAPI-Key": this.apiKey,
+                "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
+              },
+            }
+          );
 
-        if (!response.ok) {
-          console.warn(`⚠️ API request failed for page ${page}: ${response.status}`);
-          continue;
+          console.log(`📊 Response status: ${response.status}`);
+          console.log(`📊 Response headers:`, Object.fromEntries(response.headers.entries()));
+
+          if (!response.ok) {
+            if (response.status === 429) {
+              console.warn(`⚠️ Rate limit hit on page ${page}. Stopping pagination.`);
+              break;
+            }
+            console.warn(`⚠️ API request failed for page ${page}: ${response.status}`);
+            continue;
+          }
+
+          const data = await response.json();
+          console.log(`📊 Found ${data.data?.length || 0} jobs from page ${page}`);
+
+          if (data.data && Array.isArray(data.data)) {
+            const transformedJobs = this.transformJobs(data.data);
+            allJobs.push(...transformedJobs);
+          }
+        } catch (error) {
+          console.error(`❌ Error fetching page ${page}:`, error);
+          break;
         }
 
-        const data = await response.json();
-        console.log(`📊 Found ${data.data?.length || 0} jobs from page ${page}`);
-
-        if (data.data && Array.isArray(data.data)) {
-          const transformedJobs = this.transformJobs(data.data);
-          allJobs.push(...transformedJobs);
+        // Add delay between requests to avoid rate limiting
+        if (page < maxPages) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
 
@@ -259,7 +276,14 @@ class JobAPIService {
     try {
       console.log("🚀 Starting job scraping...");
 
-      const jobs = await this.fetchJobs();
+      // Add timeout to the entire scraping process
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("Scraping timeout after 5 minutes")), 5 * 60 * 1000);
+      });
+
+      const scrapingPromise = this.performScraping();
+
+      const jobs = await Promise.race([scrapingPromise, timeoutPromise]);
 
       // Check if database is available
       const dbAvailable = await isDatabaseAvailable();
@@ -279,6 +303,11 @@ class JobAPIService {
       console.error("❌ Job scraping failed:", error);
       process.exit(1);
     }
+  }
+
+  private async performScraping(): Promise<Job[]> {
+    const jobs = await this.fetchJobs();
+    return jobs;
   }
 }
 
