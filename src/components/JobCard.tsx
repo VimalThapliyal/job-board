@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Job } from "@/types/job";
 import Script from "next/script";
 import Link from "next/link";
+import Image from "next/image";
 
 interface JobCardProps {
   job: Job;
@@ -154,9 +155,11 @@ export default function JobCard({ job }: JobCardProps) {
               </div>
               {job.logo ? (
                 <div className="ml-4">
-                  <img
+                  <Image
                     src={job.logo}
                     alt={`${job.company} logo`}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-lg bg-white/20 p-2"
                     onError={(e) => {
                       // Hide the image if it fails to load

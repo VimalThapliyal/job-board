@@ -12,6 +12,7 @@ export async function GET() {
     };
     return NextResponse.json({ success: true, config: safeConfig });
   } catch (error) {
+    console.error("Config retrieval error:", error);
     return NextResponse.json(
       { error: "Failed to retrieve configuration" },
       { status: 500 }
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
+    console.error("Config update error:", error);
     return NextResponse.json(
       { error: "Failed to update configuration" },
       { status: 500 }

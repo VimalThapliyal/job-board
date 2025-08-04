@@ -29,7 +29,7 @@ export default function SocialMediaAdmin() {
         setConfig(data.config);
       }
     } catch (error) {
-      //
+      console.error("Error fetching config:", error);
     } finally {
       setLoading(false);
     }
@@ -60,6 +60,7 @@ export default function SocialMediaAdmin() {
         setMessage("Failed to update configuration");
       }
     } catch (error) {
+      console.error("Error updating config:", error);
       setMessage("Failed to update configuration");
     } finally {
       setSaving(false);
@@ -97,6 +98,7 @@ export default function SocialMediaAdmin() {
         setMessage("Test post failed");
       }
     } catch (error) {
+      console.error("Error testing post:", error);
       setMessage("Test post failed");
     }
   };

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { getJobsFromDatabase } from "@/lib/database";
-import { notFound } from "next/navigation";
+
 import ApplicationForm from "@/components/ApplicationForm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

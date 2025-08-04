@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import JobCard from "@/components/JobCard";
 import SearchBar from "@/components/SearchBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Testimonials from "@/components/Testimonials";
 import { Job } from "@/types/job";
-import Link from "next/link";
+
 import Script from "next/script";
 
 // Countdown Timer Component - Redesigned
@@ -222,15 +222,7 @@ export default function Home() {
 
   const jobTypes = generateJobTypes();
 
-  const handleFooterLink = (filter: string) => {
-    if (filter === "Remote Jobs") {
-      setSelectedJobType("remote");
-    } else if (filter === "Full Time") {
-      setSelectedJobType("full-time");
-    } else if (filter === "Contract") {
-      setSelectedJobType("contract");
-    }
-  };
+
 
   const filterJobs = useCallback(() => {
     let filtered = jobs;

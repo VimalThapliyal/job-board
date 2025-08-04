@@ -269,7 +269,7 @@ export async function isDatabaseAvailable(): Promise<boolean> {
     await connectToDatabase();
     return true;
   } catch (error) {
-    console.log("❌ Database not available, will use file system");
+    console.log("❌ Database not available, will use file system:", error);
     return false;
   }
 }

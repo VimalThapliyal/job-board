@@ -78,7 +78,8 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
       }
 
       setIsSubmitted(true);
-    } catch (err) {
+    } catch (error) {
+      console.error("Application submission error:", error);
       setError("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -108,7 +109,7 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
             Application Submitted!
           </h3>
           <p className="text-gray-600 mb-4">
-            Thank you for applying to {job.title} at {job.company}. We'll review your application and contact you soon.
+            Thank you for applying to {job.title} at {job.company}. We&apos;ll review your application and contact you soon.
           </p>
           <button
             onClick={() => setIsSubmitted(false)}

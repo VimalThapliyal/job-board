@@ -7,16 +7,18 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
 
-    // Extract form data
-    const jobId = formData.get("jobId") as string;
-    const jobTitle = formData.get("jobTitle") as string;
-    const company = formData.get("company") as string;
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const phone = formData.get("phone") as string;
-    const experience = formData.get("experience") as string;
-    const coverLetter = formData.get("coverLetter") as string;
-    const resume = formData.get("resume") as File;
+    // Extract form data with proper typing for server environment
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formDataAny = formData as any;
+    const jobId = String(formDataAny.get("jobId") || "");
+    const jobTitle = String(formDataAny.get("jobTitle") || "");
+    const company = String(formDataAny.get("company") || "");
+    const name = String(formDataAny.get("name") || "");
+    const email = String(formDataAny.get("email") || "");
+    const phone = String(formDataAny.get("phone") || "");
+    const experience = String(formDataAny.get("experience") || "");
+    const coverLetter = String(formDataAny.get("coverLetter") || "");
+    const resume = formDataAny.get("resume") as File | null;
 
     // Validate required fields
     if (!jobId || !name || !email || !experience) {

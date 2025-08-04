@@ -61,7 +61,7 @@ const testimonials: Testimonial[] = [
     role: "CTO",
     company: "ScaleUp Ventures",
     content:
-      "We've hired 5 React developers through this platform in the last year. The quality of candidates and the streamlined hiring process has been game-changing for our startup. Highly recommend for both employers and job seekers.",
+      "We&apos;ve hired 5 React developers through this platform in the last year. The quality of candidates and the streamlined hiring process has been game-changing for our startup. Highly recommend for both employers and job seekers.",
     rating: 5,
   },
 ];
@@ -114,7 +114,7 @@ const Testimonials: React.FC = () => {
 
               {/* Content */}
               <blockquote className="text-gray-700 mb-6 leading-relaxed">
-                "{testimonial.content}"
+                &ldquo;{testimonial.content}&rdquo;
               </blockquote>
 
               {/* Author */}

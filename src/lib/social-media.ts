@@ -47,6 +47,7 @@ export function generateSocialPost(
 }
 
 // Mastodon API Integration (Completely Free)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postToMastodon(job: Job): Promise<PostingResult> {
   return {
     platform: "mastodon",
@@ -57,6 +58,7 @@ export async function postToMastodon(job: Job): Promise<PostingResult> {
 }
 
 // Discord Webhook Integration (Free)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postToDiscord(job: Job): Promise<PostingResult> {
   return {
     platform: "discord",
@@ -136,6 +138,7 @@ export async function postToLinkedIn(job: Job): Promise<PostingResult> {
 }
 
 // Facebook Graph API Integration (Free with limitations)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postToFacebook(job: Job): Promise<PostingResult> {
   return {
     platform: "facebook",
@@ -146,6 +149,7 @@ export async function postToFacebook(job: Job): Promise<PostingResult> {
 }
 
 // Reddit API Integration (Free)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postToReddit(job: Job): Promise<PostingResult> {
   return {
     platform: "reddit",
@@ -156,6 +160,7 @@ export async function postToReddit(job: Job): Promise<PostingResult> {
 }
 
 // Telegram Bot API Integration (Free)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postToTelegram(job: Job): Promise<PostingResult> {
   return {
     platform: "telegram",

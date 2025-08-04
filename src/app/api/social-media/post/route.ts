@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
+    console.error("Social media posting error:", error);
     return NextResponse.json(
       { error: "Failed to post to social media" },
       { status: 500 }

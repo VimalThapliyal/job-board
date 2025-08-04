@@ -32,6 +32,7 @@ export default function AdminAuth({ children }: AdminAuthProps) {
         setError("Invalid admin password");
       }
     } catch (error) {
+      console.error("Authentication error:", error);
       setError("Authentication failed");
     }
   };
