@@ -1,6 +1,10 @@
 import { Job } from "@/types/job";
 import dotenv from "dotenv";
-import { isDatabaseAvailable, addJobsToDatabase } from "@/lib/database";
+import {
+  isDatabaseAvailable,
+  addJobsToDatabase,
+  closeDatabaseConnection,
+} from "@/lib/database";
 
 // Load environment variables
 dotenv.config({ path: ".env.local" });
@@ -24,7 +28,7 @@ class JobAPIService {
 
       for (let page = 1; page <= maxPages; page++) {
         console.log(`📄 Fetching page ${page}/${maxPages}...`);
-        
+
         try {
           const response = await fetch(
             `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=1&country=us`,
@@ -38,19 +42,28 @@ class JobAPIService {
           );
 
           console.log(`📊 Response status: ${response.status}`);
-          console.log(`📊 Response headers:`, Object.fromEntries(response.headers.entries()));
+          console.log(
+            `📊 Response headers:`,
+            Object.fromEntries(response.headers.entries())
+          );
 
           if (!response.ok) {
             if (response.status === 429) {
-              console.warn(`⚠️ Rate limit hit on page ${page}. Stopping pagination.`);
+              console.warn(
+                `⚠️ Rate limit hit on page ${page}. Stopping pagination.`
+              );
               break;
             }
-            console.warn(`⚠️ API request failed for page ${page}: ${response.status}`);
+            console.warn(
+              `⚠️ API request failed for page ${page}: ${response.status}`
+            );
             continue;
           }
 
           const data = await response.json();
-          console.log(`📊 Found ${data.data?.length || 0} jobs from page ${page}`);
+          console.log(
+            `📊 Found ${data.data?.length || 0} jobs from page ${page}`
+          );
 
           if (data.data && Array.isArray(data.data)) {
             const transformedJobs = this.transformJobs(data.data);
@@ -63,7 +76,7 @@ class JobAPIService {
 
         // Add delay between requests to avoid rate limiting
         if (page < maxPages) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       }
 
@@ -278,7 +291,10 @@ class JobAPIService {
 
       // Add timeout to the entire scraping process
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("Scraping timeout after 5 minutes")), 5 * 60 * 1000);
+        setTimeout(
+          () => reject(new Error("Scraping timeout after 5 minutes")),
+          5 * 60 * 1000
+        );
       });
 
       const scrapingPromise = this.performScraping();
@@ -299,8 +315,19 @@ class JobAPIService {
       }
 
       console.log(`🎉 Successfully processed ${jobs.length} jobs`);
+
+      // Close database connection to allow process to exit
+      await closeDatabaseConnection();
+      console.log("✅ Database connection closed");
     } catch (error) {
       console.error("❌ Job scraping failed:", error);
+      // Close database connection even on error
+      try {
+        await closeDatabaseConnection();
+        console.log("✅ Database connection closed after error");
+      } catch (closeError) {
+        console.error("❌ Failed to close database connection:", closeError);
+      }
       process.exit(1);
     }
   }
