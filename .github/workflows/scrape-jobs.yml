@@ -35,6 +35,9 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "RAPIDAPI_KEY=${{ secrets.RAPIDAPI_KEY }}" >> $GITHUB_ENV
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
+          echo "MONGODB_DB_NAME=${{ secrets.MONGODB_DB_NAME }}" >> $GITHUB_ENV
+          echo "MONGODB_COLLECTION=${{ secrets.MONGODB_COLLECTION }}" >> $GITHUB_ENV
 
       - name: Run scraper
         run: npm run scrape
@@ -51,5 +54,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Update job listings [skip ci]"
-          git push
+            git push
           fi
