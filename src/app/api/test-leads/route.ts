@@ -4,11 +4,12 @@ import { getLeadsFromDatabase } from "@/lib/database";
 export async function GET() {
   try {
     const leads = await getLeadsFromDatabase();
-    
+
     return NextResponse.json({
       success: true,
       count: leads.length,
-      leads: leads.map(lead => ({
+      leads: leads.map((lead) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         id: (lead as any)._id || lead.jobId,
         name: lead.name,
         email: lead.email,
@@ -16,18 +17,18 @@ export async function GET() {
         company: lead.company,
         status: lead.status,
         createdAt: lead.createdAt,
-        resumeUrl: lead.resumeUrl
-      }))
+        resumeUrl: lead.resumeUrl,
+      })),
     });
   } catch (error) {
     console.error("❌ Error fetching leads:", error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: "Failed to fetch leads",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
   }
-} 
+}

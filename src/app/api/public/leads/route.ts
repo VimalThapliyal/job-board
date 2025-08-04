@@ -9,6 +9,7 @@ export async function GET() {
       success: true,
       count: leads.length,
       leads: leads.map((lead) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         id: (lead as any)._id || lead.jobId,
         name: lead.name,
         email: lead.email,
