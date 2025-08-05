@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Job } from "@/types/job";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface ApplicationFormProps {
   job: Job;
@@ -31,7 +32,9 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
   const [error, setError] = useState("");
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -63,7 +66,7 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
       formDataToSend.append("phone", formData.phone);
       formDataToSend.append("experience", formData.experience);
       formDataToSend.append("coverLetter", formData.coverLetter);
-      
+
       if (formData.resume) {
         formDataToSend.append("resume", formData.resume);
       }
@@ -109,7 +112,8 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
             Application Submitted!
           </h3>
           <p className="text-gray-600 mb-4">
-            Thank you for applying to {job.title} at {job.company}. We&apos;ll review your application and contact you soon.
+            Thank you for applying to {job.title} at {job.company}. We&apos;ll
+            review your application and contact you soon.
           </p>
           <button
             onClick={() => setIsSubmitted(false)}
@@ -125,7 +129,7 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
       <h2 className="text-xl font-semibold mb-4">Apply for this position</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
@@ -243,15 +247,24 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
-          {isSubmitting ? "Submitting..." : "Submit Application"}
+          {isSubmitting ? (
+            <>
+              <LoadingSpinner size="sm" color="white" className="mr-2" />
+              Submitting...
+            </>
+          ) : (
+            "Submit Application"
+          )}
         </button>
       </form>
 
       <div className="mt-4 text-xs text-gray-500">
-        <p>By applying, you agree to our terms of service and privacy policy.</p>
+        <p>
+          By applying, you agree to our terms of service and privacy policy.
+        </p>
       </div>
     </div>
   );
-} 
+}
