@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { getJobsFromDatabase } from "@/lib/database";
+import { getJobById } from "@/lib/database";
 
 import ApplicationForm from "@/components/ApplicationForm";
 import Header from "@/components/Header";
@@ -64,44 +64,33 @@ async function getJob(id: string) {
     // Decode the URL-encoded job ID
     const decodedId = decodeURIComponent(id);
 
-    const jobs = await getJobsFromDatabase();
     console.log(`🔍 Looking for job with ID: ${decodedId}`);
-    console.log(`📊 Total jobs available: ${jobs.length}`);
 
-    const job = jobs.find((j) => j.id === decodedId);
+    const job = await getJobById(decodedId);
 
     if (!job) {
-      console.log(
-        `❌ Job not found. Available IDs: ${jobs
-          .slice(0, 3)
-          .map((j) => j.id)
-          .join(", ")}...`
-      );
-    } else {
-      console.log(`✅ Found job: ${job.title} at ${job.company}`);
+      console.log(`❌ Job not found with ID: ${decodedId}`);
+      return null;
     }
 
     // Clean the job object to remove MongoDB-specific fields
-    if (job) {
-      const cleanJob = {
-        id: job.id,
-        title: job.title,
-        company: job.company,
-        location: job.location,
-        type: job.type,
-        salary: job.salary,
-        description: job.description,
-        applyUrl: job.applyUrl,
-        postedDate: job.postedDate,
-        logo: job.logo,
-        tags: job.tags,
-        experience: job.experience,
-        skills: job.skills,
-      };
-      return cleanJob;
-    }
+    const cleanJob = {
+      id: job.id,
+      title: job.title,
+      company: job.company,
+      location: job.location,
+      type: job.type,
+      salary: job.salary,
+      description: job.description,
+      applyUrl: job.applyUrl,
+      postedDate: job.postedDate,
+      logo: job.logo,
+      tags: job.tags,
+      experience: job.experience,
+      skills: job.skills,
+    };
 
-    return null;
+    return cleanJob;
   } catch (error) {
     console.error("Error fetching job:", error);
     return null;
@@ -350,7 +339,7 @@ export default async function JobPage({ params }: JobPageProps) {
                     Required Skills
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {job.skills.map((skill, index) => (
+                    {job.skills.map((skill: string, index: number) => (
                       <span
                         key={index}
                         className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"

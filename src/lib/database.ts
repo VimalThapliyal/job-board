@@ -105,6 +105,25 @@ export async function getJobsFromDatabase(): Promise<Job[]> {
   }
 }
 
+// Get a single job by ID (optimized for performance)
+export async function getJobById(jobId: string): Promise<Job | null> {
+  try {
+    const collection = await getJobsCollection();
+    const job = await collection.findOne({ id: jobId });
+    
+    if (job) {
+      console.log(`✅ Retrieved job: ${job.title} at ${job.company}`);
+    } else {
+      console.log(`❌ Job not found with ID: ${jobId}`);
+    }
+    
+    return job;
+  } catch (error) {
+    console.error("❌ Failed to get job by ID:", error);
+    return null;
+  }
+}
+
 // Clean up old jobs (older than 1 month)
 export async function cleanupOldJobs(): Promise<void> {
   try {
