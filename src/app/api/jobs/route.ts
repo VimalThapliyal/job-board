@@ -27,6 +27,12 @@ export async function GET() {
       cleanupOldJobs().catch(console.error);
 
       const response = NextResponse.json(jobs);
+
+      // Add CORS headers for production
+      response.headers.set("Access-Control-Allow-Origin", "*");
+      response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+      response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
       response.headers.set(
         "Cache-Control",
         "public, s-maxage=300, stale-while-revalidate=600"
@@ -49,6 +55,12 @@ export async function GET() {
           console.log(`🔍 API: Loaded ${jobs.length} jobs from data file`);
 
           const response = NextResponse.json(jobs);
+
+          // Add CORS headers for production
+          response.headers.set("Access-Control-Allow-Origin", "*");
+          response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+          response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
           response.headers.set(
             "Cache-Control",
             "public, s-maxage=300, stale-while-revalidate=600"
@@ -101,6 +113,12 @@ export async function GET() {
       console.log("🔍 API: Using sample data (no database or jobs.json found)");
 
       const response = NextResponse.json(sampleJobs);
+
+      // Add CORS headers for production
+      response.headers.set("Access-Control-Allow-Origin", "*");
+      response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+      response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
       response.headers.set("Cache-Control", "public, s-maxage=60");
       response.headers.set("X-Job-Count", sampleJobs.length.toString());
       response.headers.set("X-Data-Source", "sample");
@@ -119,6 +137,17 @@ export async function GET() {
 
     return errorResponse;
   }
+}
+
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 });
+  
+  // Add CORS headers for preflight requests
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  
+  return response;
 }
 
 export async function POST(request: Request) {
