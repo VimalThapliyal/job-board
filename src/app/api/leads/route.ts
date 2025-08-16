@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveLeadToDatabase } from "@/lib/database";
+import { uploadFileFromFormData } from "@/lib/file-upload";
+import { qualifyLead } from "@/lib/lead-qualification";
+import { sendLeadConfirmation } from "@/lib/email-service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +19,6 @@ export async function POST(request: NextRequest) {
     const phone = String(formDataAny.get("phone") || "");
     const experience = String(formDataAny.get("experience") || "");
     const coverLetter = String(formDataAny.get("coverLetter") || "");
-    const resume = formDataAny.get("resume") as File | null;
 
     // Validate required fields
     if (!jobId || !name || !email || !experience) {
@@ -35,27 +37,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Handle file upload
+    // Handle file upload using Vercel Blob
     let resumeUrl = "";
-    if (resume) {
-      try {
-        // For Vercel deployment, we'll store file info in the database
-        // and handle file storage separately or use a cloud storage service
-        const timestamp = Date.now();
-        const sanitizedName = resume.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-        const fileName = `${timestamp}-${sanitizedName}`;
-
-        // For now, we'll store the file info but not the actual file
-        // In production, you'd want to use a service like AWS S3, Cloudinary, or similar
-        resumeUrl = `resume_${fileName}`;
-        console.log(`📁 Resume info saved: ${resumeUrl}`);
-
-        // TODO: Implement proper file storage for production
-        // For now, we'll just store the filename
-      } catch (fileError) {
-        console.error("❌ Error processing resume:", fileError);
-        // Continue without resume if there's an error
-        resumeUrl = "error_uploading";
+    console.log("📁 Starting file upload process...");
+    
+    const uploadResult = await uploadFileFromFormData(formData);
+    
+    if (uploadResult.success && uploadResult.url) {
+      resumeUrl = uploadResult.url;
+      console.log(`✅ Resume uploaded successfully: ${resumeUrl}`);
+    } else {
+      console.error("❌ Resume upload failed:", uploadResult.error);
+      // Continue without resume if there's an error
+      resumeUrl = "error_uploading";
+      
+      // Log the specific error for debugging
+      if (uploadResult.error) {
+        console.error("📋 Upload error details:", {
+          error: uploadResult.error,
+          timestamp: new Date().toISOString(),
+          user: name,
+          email: email,
+          jobTitle: jobTitle,
+          company: company
+        });
       }
     }
 
@@ -71,15 +76,30 @@ export async function POST(request: NextRequest) {
       coverLetter: coverLetter || "",
       resumeUrl,
       status: "new" as const,
-      qualificationScore: 0, // Will be calculated later
+      qualificationScore: 0, // Will be calculated below
       createdAt: new Date(),
       updatedAt: new Date(),
       ipAddress: request.headers.get("x-forwarded-for") || "unknown",
       userAgent: request.headers.get("user-agent") || "unknown",
     };
 
+    // Qualify the lead
+    const qualification = qualifyLead(lead);
+    lead.qualificationScore = qualification.score;
+
+    console.log(`🎯 Lead qualified: ${name} - Score: ${qualification.score}/100 - Level: ${qualification.level} - Price: $${qualification.price}`);
+
     // Save to database
     await saveLeadToDatabase(lead);
+
+    // Send confirmation email to candidate
+    try {
+      await sendLeadConfirmation(lead);
+      console.log(`✅ Confirmation email sent to ${name} (${email})`);
+    } catch (emailError) {
+      console.error(`❌ Failed to send confirmation email to ${email}:`, emailError);
+      // Continue even if email fails
+    }
 
     console.log(`✅ New lead saved: ${name} for ${jobTitle} at ${company}`);
 
@@ -88,6 +108,13 @@ export async function POST(request: NextRequest) {
         success: true,
         message: "Application submitted successfully",
         leadId: lead.jobId,
+        resumeUploaded: resumeUrl !== "error_uploading",
+        qualification: {
+          score: qualification.score,
+          level: qualification.level,
+          price: qualification.price,
+          reasoning: qualification.reasoning,
+        },
       },
       { status: 201 }
     );

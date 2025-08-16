@@ -127,16 +127,18 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
-      <h2 className="text-xl font-semibold mb-4">Apply for this position</h2>
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 sticky top-8">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4">
+        Apply for this position
+      </h2>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Full Name *
@@ -147,7 +149,7 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
             required
             value={formData.name}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             placeholder="Your full name"
           />
         </div>
@@ -162,7 +164,7 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
             required
             value={formData.email}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             placeholder="your.email@example.com"
           />
         </div>
@@ -176,46 +178,9 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
             name="phone"
             value={formData.phone}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             placeholder="+1 (555) 123-4567"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Years of Experience *
-          </label>
-          <select
-            name="experience"
-            required
-            value={formData.experience}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select experience level</option>
-            <option value="0-1">0-1 years</option>
-            <option value="1-3">1-3 years</option>
-            <option value="3-5">3-5 years</option>
-            <option value="5-10">5-10 years</option>
-            <option value="10+">10+ years</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Resume/CV *
-          </label>
-          <input
-            type="file"
-            name="resume"
-            accept=".pdf,.doc,.docx"
-            required
-            onChange={handleFileChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            PDF, DOC, or DOCX (max 5MB)
-          </p>
         </div>
 
         <div>
@@ -224,47 +189,90 @@ export default function ApplicationForm({ job }: ApplicationFormProps) {
           </label>
           <textarea
             name="coverLetter"
-            rows={4}
             value={formData.coverLetter}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base resize-vertical"
             placeholder="Tell us why you're interested in this position..."
           />
         </div>
 
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="consent"
-            required
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label htmlFor="consent" className="ml-2 block text-sm text-gray-700">
-            I agree to share my information with potential employers
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Resume/CV *
           </label>
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+            <div className="space-y-1 text-center">
+              <svg
+                className="mx-auto h-8 w-8 text-gray-400"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <div className="flex text-sm text-gray-600">
+                <label
+                  htmlFor="resume-upload"
+                  className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                >
+                  <span>Upload a file</span>
+                  <input
+                    id="resume-upload"
+                    name="resume"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileChange}
+                    className="sr-only"
+                    required
+                  />
+                </label>
+                <p className="pl-1">or drag and drop</p>
+              </div>
+              <p className="text-xs text-gray-500">PDF, DOC, DOCX up to 10MB</p>
+            </div>
+          </div>
+          {formData.resume && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+              <svg
+                className="w-4 h-4 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              {formData.resume.name}
+            </div>
+          )}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none disabled:opacity-50 text-sm sm:text-base"
         >
           {isSubmitting ? (
-            <>
-              <LoadingSpinner size="sm" color="white" className="mr-2" />
+            <div className="flex items-center justify-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               Submitting...
-            </>
+            </div>
           ) : (
             "Submit Application"
           )}
         </button>
       </form>
-
-      <div className="mt-4 text-xs text-gray-500">
-        <p>
-          By applying, you agree to our terms of service and privacy policy.
-        </p>
-      </div>
     </div>
   );
 }

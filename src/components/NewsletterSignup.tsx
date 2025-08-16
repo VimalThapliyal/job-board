@@ -110,7 +110,7 @@ export default function NewsletterSignup({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl p-8 text-white ${className}`}
+      className={`relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 rounded-3xl p-8 text-white ${className}`}
     >
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 animate-pulse"></div>

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getJobsCollection, updateJobInDatabase } from "@/lib/database";
+import {
+  getActiveJobPostings,
+  getJobPostingStats,
+  updateJobInDatabase,
+} from "@/lib/database";
 
 export async function PUT(request: NextRequest) {
   try {
@@ -33,9 +37,9 @@ export async function PUT(request: NextRequest) {
     if (success) {
       console.log(`✅ Job updated: ${title} at ${company}`);
       return NextResponse.json(
-        { 
-          success: true, 
-          message: "Job updated successfully" 
+        {
+          success: true,
+          message: "Job updated successfully",
         },
         { status: 200 }
       );
@@ -45,7 +49,6 @@ export async function PUT(request: NextRequest) {
         { status: 404 }
       );
     }
-
   } catch (error) {
     console.error("❌ Error updating job:", error);
     return NextResponse.json(
@@ -55,17 +58,26 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const collection = await getJobsCollection();
-    const jobs = await collection.find({}, { projection: { id: 1, title: 1, company: 1 } }).toArray();
-    
-    return NextResponse.json(jobs);
+    // Get active job postings
+    const jobPostings = await getActiveJobPostings();
+
+    // Get job posting statistics
+    const stats = await getJobPostingStats();
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        jobPostings,
+        stats,
+      },
+    });
   } catch (error) {
-    console.error("❌ Error fetching jobs:", error);
+    console.error("Error fetching job postings:", error);
     return NextResponse.json(
-      { error: "Failed to fetch jobs" },
+      { error: "Failed to fetch job postings" },
       { status: 500 }
     );
   }
-} 
+}

@@ -145,22 +145,22 @@ export default function JobCard({ job }: JobCardProps) {
       <Link href={`/jobs/${encodeURIComponent(job.id)}`} className="block">
         <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer">
           {/* Header with subtle gradient */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2 group-hover:text-blue-100 transition-colors">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 sm:p-6 text-white">
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-blue-100 transition-colors line-clamp-2">
                   {job.title}
                 </h3>
-                <p className="text-blue-100 font-medium">{job.company}</p>
+                <p className="text-blue-100 font-medium text-sm sm:text-base truncate">{job.company}</p>
               </div>
               {job.logo ? (
-                <div className="ml-4">
+                <div className="ml-3 sm:ml-4 flex-shrink-0">
                   <Image
                     src={job.logo}
                     alt={`${job.company} logo`}
                     width={48}
                     height={48}
-                    className="w-12 h-12 rounded-lg bg-white/20 p-2"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/20 p-2"
                     onError={(e) => {
                       // Hide the image if it fails to load
                       const target = e.target as HTMLImageElement;
@@ -169,8 +169,8 @@ export default function JobCard({ job }: JobCardProps) {
                   />
                 </div>
               ) : (
-                <div className="ml-4 w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">
+                <div className="ml-3 sm:ml-4 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm sm:text-lg">
                     {job.company.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -178,9 +178,9 @@ export default function JobCard({ job }: JobCardProps) {
             </div>
 
             {/* Job type badge */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${getJobTypeColor(
+                className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getJobTypeColor(
                   job.type
                 )}`}
               >
@@ -188,7 +188,7 @@ export default function JobCard({ job }: JobCardProps) {
               </span>
               {isMeaningfulSalary(job.salary) && (
                 <span
-                  className={`text-sm font-semibold ${getSalaryColor(
+                  className={`text-xs sm:text-sm font-semibold ${getSalaryColor(
                     job.salary
                   )}`}
                 >
@@ -199,12 +199,12 @@ export default function JobCard({ job }: JobCardProps) {
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Location and posted date */}
-            <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 text-sm text-gray-600 gap-2">
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-4 h-4"
+                  className="w-4 h-4 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -222,11 +222,11 @@ export default function JobCard({ job }: JobCardProps) {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span className="font-medium">{job.location}</span>
+                <span className="font-medium truncate">{job.location}</span>
               </div>
               <div className="flex items-center gap-1">
                 <svg
-                  className="w-4 h-4"
+                  className="w-4 h-4 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -247,7 +247,7 @@ export default function JobCard({ job }: JobCardProps) {
             </div>
 
             {/* Job description */}
-            <div className="mb-4">
+            <div className="mb-3 sm:mb-4">
               <p className="text-gray-700 text-sm line-clamp-3">
                 {job.description}
               </p>
@@ -255,11 +255,11 @@ export default function JobCard({ job }: JobCardProps) {
 
             {/* Skills */}
             {job.skills && job.skills.length > 0 && (
-              <div className="mb-4">
+              <div className="mb-3 sm:mb-4">
                 <h4 className="text-sm font-semibold text-gray-800 mb-2">
                   Required Skills:
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   {job.skills.slice(0, 3).map((skill, index) => (
                     <span
                       key={index}
@@ -279,10 +279,10 @@ export default function JobCard({ job }: JobCardProps) {
 
             {/* Experience level */}
             {job.experience && (
-              <div className="mb-4">
+              <div className="mb-3 sm:mb-4">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                   <svg
-                    className="w-3 h-3 mr-1"
+                    className="w-3 h-3 mr-1 flex-shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -300,11 +300,11 @@ export default function JobCard({ job }: JobCardProps) {
             )}
 
             {/* View Details Button */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-              <button className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
+              <button className="inline-flex items-center px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
                 View Details
                 <svg
-                  className="w-4 h-4 ml-2"
+                  className="w-4 h-4 ml-2 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -319,9 +319,9 @@ export default function JobCard({ job }: JobCardProps) {
               </button>
 
               {/* Like button */}
-              <button className="p-3 text-gray-400 hover:text-blue-600 transition-colors">
+              <button className="p-2 sm:p-3 text-gray-400 hover:text-blue-600 transition-colors">
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

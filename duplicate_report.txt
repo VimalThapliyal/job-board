@@ -1,0 +1,271 @@
+[dotenv@17.2.1] injecting env (7) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+🔍 Starting duplicate check for interview questions...
+✅ Connected to MongoDB
+📊 Found 69 questions in database
+
+📊 Duplicate Check Report
+========================
+
+Total Questions: 69
+Duplicates Found: 24
+
+🔍 Duplicate Groups:
+==================
+
+Group 1 (2 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What is the useMemo hook and how does it work?
+     ID: what-is-the-usememo-hook-and-how-does-it-work
+     Difficulty: intermediate
+     Categories: Hooks
+     Tags: usememo, performance, memoization, optimization
+
+  2. What is the useCallback hook and when should you use it?
+     ID: what-is-the-usecallback-hook-and-when-should-you-u
+     Difficulty: intermediate
+     Categories: Hooks
+     Tags: usecallback, performance, memoization, optimization
+
+Group 2 (2 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What is React?
+     ID: what-is-react
+     Difficulty: beginner
+     Categories: React Components
+     Tags: react, component, virtual-dom, dom, advanced
+
+  2. What are the advantages of using React?
+     ID: what-are-the-advantages-of-using-react
+     Difficulty: beginner
+     Categories: React Components
+     Tags: react, component, virtual-dom, dom, intermediate
+
+Group 3 (9 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What is useState() in React?
+     ID: what-is-usestate-in-react
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, dom, usestate, functional-component, intermediate
+
+  2. What are the differences between functional and class components?
+     ID: what-are-the-differences-between-functional-and-cl
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, props, usestate, functional-component, class-component
+
+  3. Explain React state and props.
+     ID: explain-react-state-and-props
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, props, performance, functional-component, intermediate
+
+  4. Explain about types of side effects in React component.
+     ID: explain-about-types-of-side-effects-in-react-compo
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, dom, useeffect, intermediate
+
+  5. What is React Hooks?
+     ID: what-is-react-hooks
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, usestate, lifecycle, functional-component, class-component
+
+  6. Explain React Hooks.
+     ID: explain-react-hooks
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, props, usestate, lifecycle, functional-component
+
+  7. What is the use of useEffect React Hooks?
+     ID: what-is-the-use-of-useeffect-react-hooks
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, dom, useeffect, performance, functional-component
+
+  8. Why do React Hooks make use of refs?
+     ID: why-do-react-hooks-make-use-of-refs
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, dom, class-component, intermediate
+
+  9. What are Custom Hooks?
+     ID: what-are-custom-hooks
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, state, props, intermediate
+
+Group 4 (2 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What is JSX?
+     ID: what-is-jsx
+     Difficulty: beginner
+     Categories: State Management
+     Tags: react, jsx, state, dom, intermediate
+
+  2. What is the virtual DOM? How does react use the virtual DOM to render the UI?
+     ID: what-is-the-virtual-dom-how-does-react-use-the-vir
+     Difficulty: beginner
+     Categories: State Management
+     Tags: react, jsx, state, virtual-dom, dom, intermediate
+
+Group 5 (5 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What is prop drilling in React?
+     ID: what-is-prop-drilling-in-react
+     Difficulty: beginner
+     Categories: React Components
+     Tags: react, component, props, intermediate
+
+  2. What are error boundaries?
+     ID: what-are-error-boundaries
+     Difficulty: beginner
+     Categories: React Components
+     Tags: react, component, state, props, lifecycle, error-boundary, intermediate
+
+  3. How to re-render the view when the browser is resized?
+     ID: how-to-rerender-the-view-when-the-browser-is-resiz
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, state, props, intermediate
+
+  4. How to create a switching component for displaying different pages?
+     ID: how-to-create-a-switching-component-for-displaying
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: component, props, intermediate
+
+  5. What are Higher Order Components?
+     ID: what-are-higher-order-components
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, state, props, intermediate
+
+Group 6 (3 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What are the rules that must be followed while using React Hooks?
+     ID: what-are-the-rules-that-must-be-followed-while-usi
+     Difficulty: beginner
+     Categories: React Hooks
+     Tags: react, component, hook, intermediate
+
+  2. Explain about types of Hooks in React.
+     ID: explain-about-types-of-hooks-in-react
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, hook, intermediate
+
+  3. Does React Hook work with static typing?
+     ID: does-react-hook-work-with-static-typing
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, hook, intermediate
+
+Group 7 (2 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. How to perform automatic redirect after login?
+     ID: how-to-perform-automatic-redirect-after-login
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, component, hook, state, router, advanced
+
+  2. Can React Hook replaces Redux?
+     ID: can-react-hook-replaces-redux
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, component, hook, state, usestate, usereducer, advanced
+
+Group 8 (3 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. How does the performance of using Hooks will differ in comparison with the classes?
+     ID: how-does-the-performance-of-using-hooks-will-diffe
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, component, hook, props, performance, intermediate
+
+  2. What are the lifecycle methods of React?
+     ID: what-are-the-lifecycle-methods-of-react
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, component, hook, state, props, dom, lifecycle, intermediate
+
+  3. Name a few techniques to optimize React app performance.
+     ID: name-a-few-techniques-to-optimize-react-app-perfor
+     Difficulty: intermediate
+     Categories: React Hooks
+     Tags: react, component, hook, state, props, usememo, performance, intermediate
+
+Group 9 (5 questions):
+Reason: Similar questions detected
+Confidence: 90.0%
+
+  1. What are the different phases of the component lifecycle?
+     ID: what-are-the-different-phases-of-the-component-lif
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, state, props, dom, lifecycle, intermediate
+
+  2. How to pass data between react components?
+     ID: how-to-pass-data-between-react-components
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, state, props, usestate, intermediate
+
+  3. What are the different ways to style a React component?
+     ID: what-are-the-different-ways-to-style-a-react-compo
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, dom, intermediate
+
+  4. How to prevent re-renders in React?
+     ID: how-to-prevent-rerenders-in-react
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, state, props, performance, intermediate
+
+  5. Explain Strict Mode in React.
+     ID: explain-strict-mode-in-react
+     Difficulty: intermediate
+     Categories: React Components
+     Tags: react, component, dom, lifecycle, class-component, context, intermediate
+
+💡 Recommendations:
+==================
+1. Found 24 potential duplicates
+2. Review and merge similar questions
+3. Consider updating tags and categories for better organization
+
+
+🔍 Additional Analysis:
+=====================
+✅ No exact duplicate questions found
+✅ No duplicate IDs found
+✅ No content duplicates found
+
+📋 Summary:
+===========
+Total Questions: 69
+Unique Questions: 69
+Exact Duplicates: 0
+Duplicate IDs: 0
+Content Duplicates: 0
+Similar Questions: 24
+
+⚠️ Database has some duplicates that should be reviewed.

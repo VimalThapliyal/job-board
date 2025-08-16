@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Testimonials from "@/components/Testimonials";
 import { Job } from "@/types/job";
+import SEOHead from "@/components/SEOHead";
 
 import Script from "next/script";
 
@@ -55,10 +56,10 @@ function CountdownTimer() {
   }, []);
 
   return (
-    <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm rounded-full px-6 py-3 border border-white/10">
+    <div className="inline-flex items-center gap-2 sm:gap-3 bg-white/5 backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3 border border-white/10">
       <div className="flex items-center gap-1">
         <svg
-          className="w-4 h-4 text-blue-200"
+          className="w-3 h-3 sm:w-4 sm:h-4 text-blue-200"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -70,23 +71,25 @@ function CountdownTimer() {
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span className="text-blue-100 text-sm font-medium">Fresh jobs in</span>
+        <span className="text-blue-100 text-xs sm:text-sm font-medium">
+          Fresh jobs in
+        </span>
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-white font-bold text-lg">
+        <span className="text-white font-bold text-base sm:text-lg">
           {timeLeft.hours.toString().padStart(2, "0")}
         </span>
-        <span className="text-blue-200 text-sm">h</span>
+        <span className="text-blue-200 text-xs sm:text-sm">h</span>
         <span className="text-white font-bold mx-1">:</span>
-        <span className="text-white font-bold text-lg">
+        <span className="text-white font-bold text-base sm:text-lg">
           {timeLeft.minutes.toString().padStart(2, "0")}
         </span>
-        <span className="text-blue-200 text-sm">m</span>
+        <span className="text-blue-200 text-xs sm:text-sm">m</span>
         <span className="text-white font-bold mx-1">:</span>
-        <span className="text-white font-bold text-lg">
+        <span className="text-white font-bold text-base sm:text-lg">
           {timeLeft.seconds.toString().padStart(2, "0")}
         </span>
-        <span className="text-blue-200 text-sm">s</span>
+        <span className="text-blue-200 text-xs sm:text-sm">s</span>
       </div>
     </div>
   );
@@ -100,8 +103,43 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [selectedJobType, setSelectedJobType] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
-  const [visibleCount, setVisibleCount] = useState(9); // Start with 9 jobs
+  const [visibleCount, setVisibleCount] = useState(9);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  // SEO structured data for the homepage
+  const homepageStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "React Developer Jobs & Interview Prep",
+    description:
+      "Find the best React developer jobs from top companies worldwide. Practice with 100+ curated React interview questions. Updated every 6 hours with fresh opportunities.",
+    url: "https://job-board-nine-lyart.vercel.app",
+    mainEntity: {
+      "@type": "ItemList",
+      name: "React Developer Jobs",
+      description: "Latest React developer job opportunities",
+      numberOfItems: jobs.length,
+      itemListElement: jobs.slice(0, 10).map((job, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "JobPosting",
+          title: job.title,
+          company: {
+            "@type": "Organization",
+            name: job.company,
+          },
+          jobLocation: {
+            "@type": "Place",
+            addressLocality: job.location,
+          },
+          employmentType: job.type,
+          datePosted: job.postedDate,
+          url: `https://job-board-nine-lyart.vercel.app/jobs/${job.id}`,
+        },
+      })),
+    },
+  };
 
   // Breadcrumb structured data
   const breadcrumbStructuredData = {
@@ -112,13 +150,7 @@ export default function Home() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "React Developer Jobs",
-        item: "https://job-board-ieb1mlfcs-vimalthapliyals-projects.vercel.app",
+        item: "https://job-board-nine-lyart.vercel.app",
       },
     ],
   };
@@ -129,6 +161,7 @@ export default function Home() {
     "@type": "ItemList",
     name: "React Developer Jobs",
     description: "Latest React developer job opportunities from top companies",
+    url: "https://job-board-nine-lyart.vercel.app",
     numberOfItems: jobs.length,
     itemListElement: jobs.slice(0, 20).map((job, index) => ({
       "@type": "ListItem",
@@ -136,19 +169,17 @@ export default function Home() {
       item: {
         "@type": "JobPosting",
         title: job.title,
-        hiringOrganization: {
+        company: {
           "@type": "Organization",
           name: job.company,
         },
         jobLocation: {
           "@type": "Place",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: job.location,
-          },
+          addressLocality: job.location,
         },
         employmentType: job.type,
         datePosted: job.postedDate,
+        url: `https://job-board-nine-lyart.vercel.app/jobs/${job.id}`,
       },
     })),
   };
@@ -159,14 +190,72 @@ export default function Home() {
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch("/api/jobs");
+      console.log("🔄 Fetching jobs...");
+
+      // Add timeout to the fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const response = await fetch("/api/jobs", {
+        signal: controller.signal,
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log(`✅ Fetched ${data.length || 0} jobs`);
+
       setJobs(data);
       setFilteredJobs(data);
       setDisplayedJobs(data.slice(0, 9)); // Show 9 jobs initially
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching jobs:", error);
+      console.error("❌ Error fetching jobs:", error);
+
+      // Set some default jobs if the API fails
+      const defaultJobs = [
+        {
+          id: "default-1",
+          title: "React Developer",
+          company: "Tech Company",
+          location: "Remote",
+          type: "Full-time",
+          salary: "$80,000 - $120,000",
+          description: "Join our team as a React developer...",
+          applyUrl: "#",
+          postedDate: new Date().toISOString(),
+          logo: "https://via.placeholder.com/50x50",
+          tags: ["React", "JavaScript", "TypeScript"],
+          experience: "2+ years",
+          skills: ["React", "JavaScript", "TypeScript"],
+        },
+        {
+          id: "default-2",
+          title: "Frontend Developer",
+          company: "Startup",
+          location: "San Francisco, CA",
+          type: "Full-time",
+          salary: "$90,000 - $130,000",
+          description: "Exciting opportunity for a frontend developer...",
+          applyUrl: "#",
+          postedDate: new Date().toISOString(),
+          logo: "https://via.placeholder.com/50x50",
+          tags: ["React", "CSS", "HTML"],
+          experience: "3+ years",
+          skills: ["React", "CSS", "HTML", "JavaScript"],
+        },
+      ];
+
+      setJobs(defaultJobs);
+      setFilteredJobs(defaultJobs);
+      setDisplayedJobs(defaultJobs.slice(0, 9));
       setLoading(false);
     }
   };
@@ -221,8 +310,6 @@ export default function Home() {
   };
 
   const jobTypes = generateJobTypes();
-
-
 
   const filterJobs = useCallback(() => {
     let filtered = jobs;
@@ -287,6 +374,27 @@ export default function Home() {
 
   return (
     <>
+      {/* SEO Head */}
+      <SEOHead
+        title="React Developer Jobs & Interview Prep - Find Your Dream React Job"
+        description="Find the best React developer jobs from top companies worldwide. Practice with 100+ curated React interview questions. Updated every 6 hours with fresh opportunities. Apply to remote and onsite React developer positions."
+        keywords={[
+          "react developer jobs",
+          "react developer interview questions",
+          "frontend developer jobs",
+          "javascript developer jobs",
+          "remote react jobs",
+          "react hooks interview questions",
+          "react performance interview questions",
+          "react developer career",
+          "react job board",
+          "react developer hiring",
+        ]}
+        url="/"
+        type="website"
+        structuredData={homepageStructuredData}
+      />
+
       {/* Structured Data */}
       <Script
         id="breadcrumb-structured-data"
@@ -308,82 +416,86 @@ export default function Home() {
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800">
           <div className="absolute inset-0 bg-black opacity-5"></div>
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
             <div className="text-center">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 animate-fade-in">
                 Find Your Dream
                 <span className="block text-blue-100">React Job</span>
               </h1>
-              <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl text-blue-100 mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
                 Discover the best React developer opportunities from top
                 companies worldwide. Updated every 6 hours with fresh
                 opportunities.
               </p>
 
               {/* Redesigned Countdown Timer */}
-              <div className="flex justify-center mb-8">
+              <div className="flex justify-center mb-6 sm:mb-8">
                 <CountdownTimer />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 w-full max-w-2xl">
                   <SearchBar
                     value={searchTerm}
                     onChange={setSearchTerm}
                     placeholder="Search jobs, companies, or skills..."
-                    className="w-full text-lg py-4"
+                    className="w-full text-base sm:text-lg py-3 sm:py-4"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Subtle floating elements */}
-          <div className="absolute top-10 left-10 w-16 h-16 bg-white/5 rounded-full animate-bounce"></div>
-          <div className="absolute top-20 right-20 w-12 h-12 bg-white/5 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-10 left-1/4 w-8 h-8 bg-white/5 rounded-full animate-spin"></div>
+          {/* Subtle floating elements - hidden on mobile */}
+          <div className="absolute top-10 left-10 w-16 h-16 bg-white/5 rounded-full animate-bounce hidden sm:block"></div>
+          <div className="absolute top-20 right-20 w-12 h-12 bg-white/5 rounded-full animate-pulse hidden sm:block"></div>
+          <div className="absolute bottom-10 left-1/4 w-8 h-8 bg-white/5 rounded-full animate-spin hidden sm:block"></div>
         </div>
 
         {/* Stats Section */}
         <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
-                <div className="text-2xl font-bold">{jobs.length}</div>
-                <div className="text-sm opacity-90">Active Jobs</div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-3 sm:p-4 text-white">
+                <div className="text-xl sm:text-2xl font-bold">
+                  {jobs.length}
+                </div>
+                <div className="text-xs sm:text-sm opacity-90">Active Jobs</div>
               </div>
-              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
-                <div className="text-2xl font-bold">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-3 sm:p-4 text-white">
+                <div className="text-xl sm:text-2xl font-bold">
                   {new Set(jobs.map((j) => j.company)).size}
                 </div>
-                <div className="text-sm opacity-90">Companies</div>
+                <div className="text-xs sm:text-sm opacity-90">Companies</div>
               </div>
-              <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-4 text-white">
-                <div className="text-2xl font-bold">
+              <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-3 sm:p-4 text-white">
+                <div className="text-xl sm:text-2xl font-bold">
                   {
                     jobs.filter((j) =>
                       j.location.toLowerCase().includes("remote")
                     ).length
                   }
                 </div>
-                <div className="text-sm opacity-90">Remote Jobs</div>
+                <div className="text-xs sm:text-sm opacity-90">Remote Jobs</div>
               </div>
-              <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg p-4 text-white">
-                <div className="text-2xl font-bold">6h</div>
-                <div className="text-sm opacity-90">Update Cycle</div>
+              <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg p-3 sm:p-4 text-white">
+                <div className="text-xl sm:text-2xl font-bold">6h</div>
+                <div className="text-xs sm:text-sm opacity-90">
+                  Update Cycle
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Filters Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <div className="flex flex-col lg:flex-row gap-6">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
               {/* Job Type Filter */}
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
                   Job Type
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -391,7 +503,7 @@ export default function Home() {
                     <button
                       key={type.id}
                       onClick={() => setSelectedJobType(type.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                         selectedJobType === type.id
                           ? "bg-blue-600 text-white shadow-lg transform scale-105"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
@@ -405,13 +517,13 @@ export default function Home() {
 
               {/* Sort Options */}
               <div className="lg:w-48">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
                   Sort By
                 </h3>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 >
                   <option value="latest">Latest First</option>
                   <option value="company">Company Name</option>
@@ -422,9 +534,9 @@ export default function Home() {
           </div>
 
           {/* Results Section */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 {filteredJobs.length}{" "}
                 {filteredJobs.length === 1 ? "Job" : "Jobs"} Found
               </h2>
@@ -436,18 +548,20 @@ export default function Home() {
             </div>
 
             {filteredJobs.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              <div className="text-center py-8 sm:py-12">
+                <div className="text-gray-400 text-4xl sm:text-6xl mb-4">
+                  🔍
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-600 mb-2">
                   No jobs found
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm sm:text-base">
                   Try adjusting your search criteria or filters
                 </p>
               </div>
             ) : (
               <>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {displayedJobs.map((job) => (
                     <div
                       key={job.id}
@@ -460,21 +574,21 @@ export default function Home() {
 
                 {/* Load More Button */}
                 {visibleCount < filteredJobs.length && (
-                  <div className="flex justify-center items-center py-8">
+                  <div className="flex justify-center items-center py-6 sm:py-8">
                     <button
                       onClick={loadMoreJobs}
                       disabled={loadingMore}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none flex items-center gap-2"
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2 sm:py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none flex items-center gap-2 text-sm sm:text-base"
                     >
                       {loadingMore ? (
                         <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
                           Loading...
                         </>
                       ) : (
                         <>
                           Load More Jobs
-                          <span className="text-sm opacity-75">
+                          <span className="text-xs sm:text-sm opacity-75">
                             ({filteredJobs.length - visibleCount} more)
                           </span>
                         </>
@@ -502,9 +616,9 @@ export default function Home() {
         {/* Testimonials Section */}
         <Testimonials />
 
-        {/* Newsletter Signup Section - Full Width */}
-        <div className="w-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Newsletter Signup Section */}
+        <div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
             <NewsletterSignup />
           </div>
         </div>

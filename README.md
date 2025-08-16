@@ -1,201 +1,175 @@
-# Job Board Aggregator
+# Job Board with Interview Prep
 
-A modern job board that aggregates React developer jobs from multiple sources, built with Next.js, TypeScript, and TailwindCSS.
+A modern job board application built with Next.js, TypeScript, and MongoDB, featuring a comprehensive React interview questions section.
 
-## 🚀 Features
+## Features
 
-- **Job Listings**: Browse React developer jobs with search and filtering
-- **Responsive Design**: Works perfectly on desktop and mobile
-- **Automated Scraping**: Jobs are automatically scraped every 6 hours
-- **SEO Optimized**: Built for search engine visibility
-- **Fast Performance**: Built with Next.js for optimal performance
+### Job Board
+- Browse and search job listings
+- Apply to jobs with resume upload
+- Admin dashboard for managing leads and subscriptions
+- Social media integration
 
-## 🛠️ Tech Stack
+### Interview Prep
+- **Comprehensive React Interview Questions**: Over 100 manually curated, high-quality questions
+- **Categorized by Difficulty**: Beginner, Intermediate, and Advanced levels
+- **Multiple Categories**: React Fundamentals, Hooks, Performance, Testing, Routing, and more
+- **Search and Filter**: Find questions by difficulty, category, or search terms
+- **Detailed Explanations**: Each question includes comprehensive answers and explanations
+- **Code Examples**: Practical code examples for complex concepts
+- **User Feedback**: Helpful/not helpful voting system
+- **Mobile Responsive**: Optimized for all devices
 
-- **Frontend**: Next.js 15 + React 19 + TypeScript
-- **Styling**: TailwindCSS
-- **Scraping**: Playwright
-- **Automation**: GitHub Actions
-- **Hosting**: Vercel (recommended)
+## Interview Questions Database
 
-## 📋 Prerequisites
+### Content Overview
+- **Total Questions**: 100+ manually curated questions
+- **Difficulty Levels**: 
+  - Beginner: 30+ questions
+  - Intermediate: 40+ questions  
+  - Advanced: 30+ questions
+- **Categories**: React Fundamentals, Hooks, Performance, Testing, Routing, Security, Advanced Patterns
 
+### Question Quality
+- **Manually Curated**: All questions are hand-picked for quality and relevance
+- **Comprehensive Answers**: Detailed explanations with practical examples
+- **Real-world Focus**: Questions based on actual interview scenarios
+- **Regular Updates**: Content is regularly reviewed and updated
+
+### Categories Covered
+1. **React Fundamentals**: Components, JSX, Virtual DOM, State, Props
+2. **React Hooks**: useState, useEffect, useContext, custom hooks
+3. **React Performance**: Optimization, memoization, code splitting
+4. **React Testing**: Testing strategies, tools, best practices
+5. **React Routing**: Client-side routing, navigation
+6. **React Security**: Authentication, authorization, security best practices
+7. **React Advanced**: Suspense, Portals, SSR, Concurrent Features
+
+## Technical Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, DaisyUI
+- **Database**: MongoDB Atlas
+- **Deployment**: Vercel
+- **Image Storage**: Vercel Blob
+- **Analytics**: Vercel Analytics
+
+## Getting Started
+
+### Prerequisites
 - Node.js 18+
-- npm or yarn
-- Git
+- MongoDB Atlas account
+- Vercel account (for deployment)
 
-## 🚀 Quick Start
+### Installation
 
-### 1. Clone and Install
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd job-board
+   ```
 
-```bash
-git clone <your-repo-url>
-cd job-board
-npm install
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-### 2. Run the Development Server
+3. **Environment setup**
+   ```bash
+   cp env.example .env.local
+   ```
+   Add your MongoDB URI and other environment variables to `.env.local`
 
-```bash
-npm run dev
-```
+4. **Run development server**
+   ```bash
+   npm run dev
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-### 3. Test the Scraper (Optional)
+## Database Schema
 
-```bash
-npm run scrape
-```
-
-This will run the Indeed scraper and save jobs to `data/jobs.json`.
-
-## 📁 Project Structure
-
-```
-job-board/
-├── src/
-│   ├── app/                 # Next.js app router
-│   │   ├── api/jobs/        # API routes
-│   │   └── page.tsx         # Homepage
-│   ├── components/          # React components
-│   │   ├── JobCard.tsx
-│   │   ├── SearchBar.tsx
-│   │   └── FilterBar.tsx
-│   └── types/              # TypeScript types
-│       └── job.ts
-├── scripts/
-│   └── scrapers/           # Scraping scripts
-│       └── indeed-scraper.ts
-├── data/                   # Scraped job data (auto-generated)
-└── .github/workflows/      # GitHub Actions
-    └── scrape-jobs.yml
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env.local` file for local development:
-
-```env
-# Add any environment variables here
-NEXT_PUBLIC_API_URL=http://localhost:3000
-```
-
-### Scraper Configuration
-
-The scraper is configured to search for "react developer" jobs in "remote" locations. You can modify the search terms in `scripts/scrapers/indeed-scraper.ts`.
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Deploy automatically
-
-### Manual Deployment
-
-```bash
-npm run build
-npm start
-```
-
-## 🤖 Automation
-
-The project includes GitHub Actions that:
-
-- **Scrapes jobs every 6 hours** automatically
-- **Commits updated job data** to the repository
-- **Can be triggered manually** via GitHub Actions UI
-
-### Manual Scraping
-
-```bash
-npm run scrape
-```
-
-## 📊 Data Flow
-
-1. **Scraping**: Playwright scrapes Indeed for React developer jobs
-2. **Storage**: Jobs are saved to `data/jobs.json`
-3. **API**: Next.js API routes serve the job data
-4. **Frontend**: React components display the jobs with search/filter
-
-## 🔍 SEO Features
-
-- Static job pages for each listing
-- Meta tags and schema markup
-- Sitemap generation
-- Optimized for search engines
-
-## 🎨 Customization
-
-### Adding New Job Sources
-
-1. Create a new scraper in `scripts/scrapers/`
-2. Follow the `IndeedScraper` pattern
-3. Add to the GitHub Actions workflow
-
-### Styling
-
-The app uses TailwindCSS. Modify `src/app/globals.css` for custom styles.
-
-### Job Data Structure
-
-Jobs follow this TypeScript interface:
-
+### Interview Questions Collection
 ```typescript
-interface Job {
+interface InterviewQuestion {
   id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salary?: string;
-  description: string;
-  applyUrl: string;
-  postedDate: string;
-  logo?: string;
+  question: string;
+  answer: string;
+  explanation: string;
+  codeExample?: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  category: string[];
+  tags: string[];
+  source: string;
+  sourceUrl?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  viewCount: number;
+  helpfulCount: number;
+  notHelpfulCount: number;
 }
 ```
 
-## 🐛 Troubleshooting
+### Question Categories Collection
+```typescript
+interface QuestionCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  questionCount: number;
+}
+```
 
-### Scraper Issues
+## API Endpoints
 
-- Check if Indeed's structure has changed
-- Verify Playwright is installed: `npx playwright install`
-- Check network connectivity
+### Interview Questions
+- `GET /api/interview-questions` - Get all questions with filtering
+- `GET /api/interview-questions/[id]` - Get specific question
+- `GET /api/interview-questions/categories` - Get question categories
+- `PATCH /api/interview-questions/[id]` - Update question feedback
 
-### Build Issues
+### Query Parameters
+- `search` - Search questions by text
+- `difficulty` - Filter by difficulty level
+- `category` - Filter by category
+- `limit` - Limit number of results
+- `page` - Pagination support
 
-- Clear Next.js cache: `rm -rf .next`
-- Reinstall dependencies: `rm -rf node_modules && npm install`
+## Deployment
 
-## 📈 Future Enhancements
+### Vercel Deployment
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
-- [ ] Email job alerts
-- [ ] User authentication
-- [ ] Company dashboards
-- [ ] AI job matching
-- [ ] Multiple job categories
-- [ ] Monetization features
+### Environment Variables
+```bash
+MONGODB_URI=your_mongodb_atlas_uri
+VERCEL_BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
+```
 
-## 🤝 Contributing
+## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+### Adding New Questions
+1. Questions are manually curated in `src/lib/interview-scraper.ts`
+2. Follow the existing format and structure
+3. Ensure questions are high-quality and relevant
+4. Include comprehensive answers and explanations
 
-## 📄 License
+### Development Guidelines
+- Follow TypeScript best practices
+- Use ESLint and Prettier for code formatting
+- Write meaningful commit messages
+- Test thoroughly before submitting PRs
 
-MIT License - see LICENSE file for details
+## License
 
-## 🙏 Acknowledgments
+This project is licensed under the MIT License.
 
-- Built with Next.js and TailwindCSS
-- Job data scraped from Indeed
-- Automated with GitHub Actions
+## Support
+
+For support or questions, please open an issue on GitHub or contact the development team.

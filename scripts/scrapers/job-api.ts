@@ -31,7 +31,7 @@ class JobAPIService {
 
         try {
           const response = await fetch(
-            `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=1&country=us`,
+            `${this.baseUrl}?query=react%20developer&page=${page}&num_pages=1&country=in`,
             {
               method: "GET",
               headers: {
@@ -147,13 +147,13 @@ class JobAPIService {
 
         // Check if it contains actual numbers (dollar amounts, ranges, etc.)
         const hasNumbers = /\d/.test(salary);
-        const hasDollarSign = salary.includes("$");
+        const hasCurrencySymbol = /[$₹]/.test(salary);
         const hasRange =
           salary.includes("-") ||
           salary.includes("to") ||
           salary.includes("up to");
 
-        return hasNumbers && (hasDollarSign || hasRange);
+        return hasNumbers && (hasCurrencySymbol || hasRange);
       };
 
       return {

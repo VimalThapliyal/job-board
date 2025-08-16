@@ -105,23 +105,72 @@ export async function generateMetadata({
 
   if (!job) {
     return {
-      title: "Job Not Found",
+      title: "Job Not Found - React Developer Jobs",
+      description: "The requested job posting could not be found.",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
+  const jobTitle = `${job.title} at ${job.company}`;
+  const jobDescription = `Apply for ${job.title} position at ${job.company}. ${
+    job.location
+  } - ${job.type}. ${job.salary ? `Salary: ${job.salary}.` : ""} ${
+    job.description ? job.description.substring(0, 150) + "..." : ""
+  }`;
+  const jobUrl = `https://job-board-nine-lyart.vercel.app/jobs/${id}`;
+
   return {
-    title: `${job.title} at ${job.company} - React Developer Jobs`,
-    description: `Apply for ${job.title} position at ${job.company}. ${job.location} - ${job.type}`,
+    title: `${jobTitle} - React Developer Jobs`,
+    description: jobDescription,
     keywords: [
       "react developer",
-      "remote jobs",
       "frontend developer",
+      "javascript developer",
+      "remote jobs",
       job.company.toLowerCase(),
-    ],
+      job.location.toLowerCase(),
+      job.type.toLowerCase(),
+      ...(job.skills || []),
+    ].join(", "),
     openGraph: {
-      title: `${job.title} at ${job.company}`,
-      description: `Apply for ${job.title} position at ${job.company}`,
+      title: jobTitle,
+      description: jobDescription,
       type: "website",
+      url: jobUrl,
+      siteName: "React Developer Jobs & Interview Prep",
+      images: [
+        {
+          url: job.logo || "https://job-board-nine-lyart.vercel.app/og-job.jpg",
+          width: 1200,
+          height: 630,
+          alt: `${jobTitle} - React Developer Jobs`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: jobTitle,
+      description: jobDescription,
+      images: [
+        job.logo || "https://job-board-nine-lyart.vercel.app/og-job.jpg",
+      ],
+    },
+    alternates: {
+      canonical: jobUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
   };
 }

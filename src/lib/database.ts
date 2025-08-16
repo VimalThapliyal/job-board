@@ -1,5 +1,9 @@
 import { MongoClient, Db, Collection } from "mongodb";
 import { Job } from "@/types/job";
+import {
+  InterviewQuestion,
+  QuestionCategory,
+} from "@/types/interview-question";
 
 interface DatabaseConfig {
   uri: string;
@@ -14,6 +18,24 @@ interface EmailSubscription {
   subscribedAt: string;
   isActive: boolean;
   id?: string;
+}
+
+interface JobAlert {
+  id: string;
+  email: string;
+  jobType: string;
+  location: string;
+  experience: string;
+  salary: string;
+  frequency: string;
+  skills: string[];
+  isActive: boolean;
+  subscribedAt: Date;
+  updatedAt: Date;
+  lastSentAt: Date | null;
+  totalSent: number;
+  ipAddress: string;
+  userAgent: string;
 }
 
 // Get database configuration dynamically
@@ -51,6 +73,22 @@ export async function getJobsCollection(): Promise<Collection<Job>> {
   const database = await connectToDatabase();
   const dbConfig = getDatabaseConfig();
   return database.collection<Job>(dbConfig.collectionName);
+}
+
+// Get interview questions collection
+export async function getInterviewQuestionsCollection(): Promise<
+  Collection<InterviewQuestion>
+> {
+  const database = await connectToDatabase();
+  return database.collection<InterviewQuestion>("interview-questions");
+}
+
+// Get question categories collection
+export async function getQuestionCategoriesCollection(): Promise<
+  Collection<QuestionCategory>
+> {
+  const database = await connectToDatabase();
+  return database.collection<QuestionCategory>("question-categories");
 }
 
 // Save jobs to database (incremental - adds new jobs without deleting existing ones)
@@ -105,22 +143,385 @@ export async function getJobsFromDatabase(): Promise<Job[]> {
   }
 }
 
+// Interview Questions CRUD Operations
+
+// Save interview questions to database
+export async function saveInterviewQuestions(
+  questions: InterviewQuestion[]
+): Promise<{ saved: number; duplicates: number; total: number }> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+
+    // Get existing questions for duplicate checking
+    const existingQuestions = await collection.find({}).toArray();
+    console.log(
+      `🔍 Checking for duplicates among ${existingQuestions.length} existing questions...`
+    );
+
+    // Import duplicate checker
+    const { checkForDuplicatesBeforeSaving } = await import(
+      "./duplicate-checker"
+    );
+
+    // Check for duplicates - convert to ScrapingResult for compatibility
+    const questionsAsScrapingResult = questions.map((q) => ({
+      question: q.question,
+      answer: q.answer,
+      explanation: q.explanation,
+      codeExample: q.codeExample,
+      difficulty: q.difficulty,
+      category: q.category,
+      tags: q.tags || [],
+      source: q.source,
+      sourceUrl: q.sourceUrl || "",
+    }));
+
+    const { duplicates, uniqueQuestions } =
+      await checkForDuplicatesBeforeSaving(
+        questionsAsScrapingResult,
+        existingQuestions
+      );
+
+    if (duplicates.length > 0) {
+      console.log(`⚠️ Found ${duplicates.length} potential duplicates:`);
+      duplicates.forEach(({ question, result }) => {
+        console.log(
+          `   - "${question.question}" (${(result.confidence * 100).toFixed(
+            1
+          )}% confidence)`
+        );
+        if (result.existingQuestion) {
+          console.log(`     Similar to: "${result.existingQuestion.question}"`);
+        }
+      });
+    }
+
+    if (uniqueQuestions.length === 0) {
+      console.log("ℹ️ No new questions to add (all questions are duplicates)");
+      return {
+        saved: 0,
+        duplicates: duplicates.length,
+        total: questions.length,
+      };
+    }
+
+    // Convert back to InterviewQuestion format and add timestamps
+    const questionsWithTimestamp: InterviewQuestion[] = uniqueQuestions.map(
+      (question) => ({
+        id: generateQuestionId(question.question),
+        question: question.question,
+        answer: question.answer,
+        explanation: question.explanation || question.answer,
+        codeExample: question.codeExample || "",
+        difficulty: question.difficulty as
+          | "beginner"
+          | "intermediate"
+          | "advanced",
+        category: question.category,
+        tags: question.tags || [],
+        source: question.source,
+        sourceUrl: question.sourceUrl || "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        viewCount: 0,
+        helpfulCount: 0,
+        notHelpfulCount: 0,
+      })
+    );
+
+    // Insert unique questions
+    await collection.insertMany(questionsWithTimestamp);
+    console.log(
+      `✅ Added ${questionsWithTimestamp.length} new interview questions to database`
+    );
+    console.log(
+      `📊 Total interview questions in database: ${await collection.countDocuments()}`
+    );
+
+    return {
+      saved: questionsWithTimestamp.length,
+      duplicates: duplicates.length,
+      total: questions.length,
+    };
+  } catch (error) {
+    console.error("❌ Failed to save interview questions to database:", error);
+    throw error;
+  }
+}
+
+// Helper function to generate question ID
+function generateQuestionId(question: string): string {
+  return question
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, "-")
+    .substring(0, 50);
+}
+
+// Get all interview questions
+export async function getInterviewQuestionsFromDatabase(): Promise<
+  InterviewQuestion[]
+> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+    const questions = await collection
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+    console.log(
+      `✅ Retrieved ${questions.length} interview questions from database`
+    );
+    return questions;
+  } catch (error) {
+    console.error("❌ Failed to get interview questions from database:", error);
+    return [];
+  }
+}
+
 // Get a single job by ID (optimized for performance)
 export async function getJobById(jobId: string): Promise<Job | null> {
   try {
     const collection = await getJobsCollection();
     const job = await collection.findOne({ id: jobId });
-    
+
     if (job) {
       console.log(`✅ Retrieved job: ${job.title} at ${job.company}`);
     } else {
       console.log(`❌ Job not found with ID: ${jobId}`);
     }
-    
+
     return job;
   } catch (error) {
     console.error("❌ Failed to get job by ID:", error);
     return null;
+  }
+}
+
+// Get questions by difficulty
+export async function getQuestionsByDifficulty(
+  difficulty: "beginner" | "intermediate" | "advanced"
+): Promise<InterviewQuestion[]> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+    const questions = await collection
+      .find({ difficulty })
+      .sort({ createdAt: -1 })
+      .toArray();
+    console.log(
+      `✅ Retrieved ${questions.length} ${difficulty} questions from database`
+    );
+    return questions;
+  } catch (error) {
+    console.error("❌ Failed to get questions by difficulty:", error);
+    return [];
+  }
+}
+
+// Get questions by category
+export async function getQuestionsByCategory(
+  category: string
+): Promise<InterviewQuestion[]> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+    const questions = await collection
+      .find({ category: { $in: [category] } })
+      .sort({ createdAt: -1 })
+      .toArray();
+    console.log(
+      `✅ Retrieved ${questions.length} questions from category: ${category}`
+    );
+    return questions;
+  } catch (error) {
+    console.error("❌ Failed to get questions by category:", error);
+    return [];
+  }
+}
+
+// Get single question by ID
+export async function getQuestionById(
+  id: string
+): Promise<InterviewQuestion | null> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+    const question = await collection.findOne({ id });
+
+    if (question) {
+      // Increment view count
+      await collection.updateOne({ id }, { $inc: { viewCount: 1 } });
+      console.log(
+        `✅ Retrieved question: ${question.question.substring(0, 50)}...`
+      );
+    } else {
+      console.log(`❌ Question not found with ID: ${id}`);
+    }
+
+    return question;
+  } catch (error) {
+    console.error("❌ Failed to get question by ID:", error);
+    return null;
+  }
+}
+
+// Search questions
+export async function searchQuestions(
+  query: string
+): Promise<InterviewQuestion[]> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+    const questions = await collection
+      .find({
+        $or: [
+          { question: { $regex: query, $options: "i" } },
+          { answer: { $regex: query, $options: "i" } },
+          { explanation: { $regex: query, $options: "i" } },
+          { tags: { $in: [new RegExp(query, "i")] } },
+        ],
+      })
+      .sort({ viewCount: -1 })
+      .toArray();
+    console.log(`✅ Found ${questions.length} questions matching: "${query}"`);
+    return questions;
+  } catch (error) {
+    console.error("❌ Failed to search questions:", error);
+    return [];
+  }
+}
+
+// Update question helpful/not helpful counts
+export async function updateQuestionFeedback(
+  questionId: string,
+  isHelpful: boolean
+): Promise<void> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+    const updateField = isHelpful ? "helpfulCount" : "notHelpfulCount";
+
+    await collection.updateOne(
+      { id: questionId },
+      { $inc: { [updateField]: 1 } }
+    );
+
+    console.log(`✅ Updated feedback for question: ${questionId}`);
+  } catch (error) {
+    console.error("❌ Failed to update question feedback:", error);
+  }
+}
+
+// Update interview question
+export async function updateInterviewQuestion(
+  questionId: string,
+  updates: Partial<InterviewQuestion>
+): Promise<boolean> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+
+    // Add updatedAt timestamp
+    const updateData = {
+      ...updates,
+      updatedAt: new Date(),
+    };
+
+    const result = await collection.updateOne(
+      { id: questionId },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount > 0) {
+      console.log(`✅ Updated question ${questionId} in database`);
+      return true;
+    } else {
+      console.log(`ℹ️ Question ${questionId} not found or no changes made`);
+      return false;
+    }
+  } catch (error) {
+    console.error("❌ Failed to update question in database:", error);
+    return false;
+  }
+}
+
+// Get question statistics
+export async function getQuestionStats(): Promise<{
+  totalQuestions: number;
+  beginnerCount: number;
+  intermediateCount: number;
+  advancedCount: number;
+  categoryStats: Record<string, number>;
+}> {
+  try {
+    const collection = await getInterviewQuestionsCollection();
+
+    const totalQuestions = await collection.countDocuments();
+    const beginnerCount = await collection.countDocuments({
+      difficulty: "beginner",
+    });
+    const intermediateCount = await collection.countDocuments({
+      difficulty: "intermediate",
+    });
+    const advancedCount = await collection.countDocuments({
+      difficulty: "advanced",
+    });
+
+    // Get category statistics
+    const categoryStats = await collection
+      .aggregate([
+        { $unwind: "$category" },
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ])
+      .toArray();
+
+    const categoryStatsMap = categoryStats.reduce((acc, cat) => {
+      acc[cat._id] = cat.count;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      totalQuestions,
+      beginnerCount,
+      intermediateCount,
+      advancedCount,
+      categoryStats: categoryStatsMap,
+    };
+  } catch (error) {
+    console.error("❌ Failed to get question statistics:", error);
+    return {
+      totalQuestions: 0,
+      beginnerCount: 0,
+      intermediateCount: 0,
+      advancedCount: 0,
+      categoryStats: {},
+    };
+  }
+}
+
+// Save question categories
+export async function saveQuestionCategories(
+  categories: QuestionCategory[]
+): Promise<void> {
+  try {
+    const collection = await getQuestionCategoriesCollection();
+
+    // Clear existing categories and insert new ones
+    await collection.deleteMany({});
+    await collection.insertMany(categories);
+
+    console.log(`✅ Saved ${categories.length} question categories`);
+  } catch (error) {
+    console.error("❌ Failed to save question categories:", error);
+    throw error;
+  }
+}
+
+// Get question categories
+export async function getQuestionCategories(): Promise<QuestionCategory[]> {
+  try {
+    const collection = await getQuestionCategoriesCollection();
+    const categories = await collection.find({}).sort({ name: 1 }).toArray();
+    console.log(`✅ Retrieved ${categories.length} question categories`);
+    return categories;
+  } catch (error) {
+    console.error("❌ Failed to get question categories:", error);
+    return [];
   }
 }
 
@@ -214,7 +615,6 @@ export async function updateJobInDatabase(
 ): Promise<boolean> {
   try {
     const collection = await getJobsCollection();
-
     const result = await collection.updateOne(
       { id: jobId },
       {
@@ -225,9 +625,15 @@ export async function updateJobInDatabase(
       }
     );
 
-    return result.matchedCount > 0;
+    if (result.modifiedCount > 0) {
+      console.log(`✅ Updated job ${jobId} in database`);
+      return true;
+    } else {
+      console.log(`ℹ️ Job ${jobId} not found or no changes made`);
+      return false;
+    }
   } catch (error) {
-    console.error("❌ Error updating job:", error);
+    console.error("❌ Failed to update job in database:", error);
     return false;
   }
 }
@@ -236,11 +642,15 @@ export async function updateJobInDatabase(
 export async function deleteJobFromDatabase(jobId: string): Promise<void> {
   try {
     const collection = await getJobsCollection();
-    await collection.deleteOne({ id: jobId });
-    console.log(`✅ Deleted job ${jobId} from database`);
+    const result = await collection.deleteOne({ id: jobId });
+
+    if (result.deletedCount > 0) {
+      console.log(`✅ Deleted job ${jobId} from database`);
+    } else {
+      console.log(`ℹ️ Job ${jobId} not found in database`);
+    }
   } catch (error) {
     console.error("❌ Failed to delete job from database:", error);
-    throw error;
   }
 }
 
@@ -254,21 +664,30 @@ export async function getDatabaseStats(): Promise<{
     const collection = await getJobsCollection();
     const totalJobs = await collection.countDocuments();
 
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const recentJobs = await collection.countDocuments({
-      createdAt: { $gte: oneMonthAgo },
+      createdAt: { $gte: oneWeekAgo },
     });
 
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     const oldJobs = await collection.countDocuments({
       createdAt: { $lt: oneMonthAgo },
     });
 
-    return { totalJobs, recentJobs, oldJobs };
+    return {
+      totalJobs,
+      recentJobs,
+      oldJobs,
+    };
   } catch (error) {
     console.error("❌ Failed to get database stats:", error);
-    return { totalJobs: 0, recentJobs: 0, oldJobs: 0 };
+    return {
+      totalJobs: 0,
+      recentJobs: 0,
+      oldJobs: 0,
+    };
   }
 }
 
@@ -288,17 +707,17 @@ export async function isDatabaseAvailable(): Promise<boolean> {
     await connectToDatabase();
     return true;
   } catch (error) {
-    console.log("❌ Database not available, will use file system:", error);
+    console.error("❌ Database not available:", error);
     return false;
   }
 }
 
-// Email Subscription Functions
+// Email subscriptions functions
 export async function getSubscriptionsCollection(): Promise<
   Collection<EmailSubscription>
 > {
-  const db = await connectToDatabase();
-  return db.collection<EmailSubscription>("subscriptions");
+  const database = await connectToDatabase();
+  return database.collection<EmailSubscription>("subscriptions");
 }
 
 export async function addEmailSubscription(
@@ -306,14 +725,8 @@ export async function addEmailSubscription(
 ): Promise<void> {
   try {
     const collection = await getSubscriptionsCollection();
-    const subscriptionWithId = {
-      ...subscription,
-      id: Math.random().toString(36).substr(2, 9),
-      isActive: true,
-    };
-
-    await collection.insertOne(subscriptionWithId);
-    console.log(`✅ Added email subscription for ${subscription.email}`);
+    await collection.insertOne(subscription);
+    console.log(`✅ Added email subscription: ${subscription.email}`);
   } catch (error) {
     console.error("❌ Failed to add email subscription:", error);
     throw error;
@@ -323,7 +736,7 @@ export async function addEmailSubscription(
 export async function getEmailSubscriptions(): Promise<EmailSubscription[]> {
   try {
     const collection = await getSubscriptionsCollection();
-    const subscriptions = await collection.find({ isActive: true }).toArray();
+    const subscriptions = await collection.find({}).toArray();
     console.log(`✅ Retrieved ${subscriptions.length} email subscriptions`);
     return subscriptions;
   } catch (error) {
@@ -339,7 +752,10 @@ export async function getSubscriptionStats(): Promise<{
   locationCounts: Record<string, number>;
 }> {
   try {
-    const subscriptions = await getEmailSubscriptions();
+    const collection = await getSubscriptionsCollection();
+    const subscriptions = await collection.find({}).toArray();
+
+    const totalSubscriptions = subscriptions.length;
     const uniqueEmails = new Set(subscriptions.map((s) => s.email)).size;
 
     const jobTypeCounts: Record<string, number> = {};
@@ -351,7 +767,7 @@ export async function getSubscriptionStats(): Promise<{
     });
 
     return {
-      totalSubscriptions: subscriptions.length,
+      totalSubscriptions,
       uniqueEmails,
       jobTypeCounts,
       locationCounts,
@@ -373,26 +789,23 @@ export async function updateSubscriptionStatus(
 ): Promise<void> {
   try {
     const collection = await getSubscriptionsCollection();
-    await collection.updateMany({ email }, { $set: { isActive } });
-    console.log(`✅ Updated subscription status for ${email}`);
+    await collection.updateOne({ email }, { $set: { isActive } });
+    console.log(`✅ Updated subscription status for: ${email}`);
   } catch (error) {
     console.error("❌ Failed to update subscription status:", error);
-    throw error;
   }
 }
 
 export async function deleteEmailSubscription(email: string): Promise<void> {
   try {
     const collection = await getSubscriptionsCollection();
-    await collection.deleteMany({ email });
-    console.log(`✅ Deleted email subscription for ${email}`);
+    await collection.deleteOne({ email });
+    console.log(`✅ Deleted email subscription: ${email}`);
   } catch (error) {
     console.error("❌ Failed to delete email subscription:", error);
-    throw error;
   }
 }
 
-// Lead interface
 interface Lead {
   jobId: string;
   jobTitle: string;
@@ -468,19 +881,14 @@ export async function getLeadStats(): Promise<{
 }> {
   try {
     const collection = await getLeadsCollection();
-
     const totalLeads = await collection.countDocuments();
     const newLeads = await collection.countDocuments({ status: "new" });
     const qualifiedLeads = await collection.countDocuments({
       status: "qualified",
     });
     const soldLeads = await collection.countDocuments({ status: "sold" });
-
-    // Recent leads (last 7 days)
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const recentLeads = await collection.countDocuments({
-      createdAt: { $gte: oneWeekAgo },
+      createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
     });
 
     return {
@@ -491,7 +899,7 @@ export async function getLeadStats(): Promise<{
       recentLeads,
     };
   } catch (error) {
-    console.error("❌ Failed to get lead stats:", error);
+    console.error("Error getting lead stats:", error);
     return {
       totalLeads: 0,
       newLeads: 0,
@@ -500,4 +908,235 @@ export async function getLeadStats(): Promise<{
       recentLeads: 0,
     };
   }
+}
+
+// Job Alerts Functions
+export async function getJobAlertsCollection(): Promise<Collection<JobAlert>> {
+  const database = await connectToDatabase();
+  return database.collection<JobAlert>("job-alerts");
+}
+
+export async function addJobAlert(jobAlert: JobAlert): Promise<void> {
+  try {
+    const collection = await getJobAlertsCollection();
+    await collection.insertOne(jobAlert);
+    console.log(`✅ Job alert saved for ${jobAlert.email}`);
+  } catch (error) {
+    console.error("Error saving job alert:", error);
+    throw error;
+  }
+}
+
+export async function getJobAlertsByEmail(email: string): Promise<JobAlert[]> {
+  try {
+    const collection = await getJobAlertsCollection();
+    return await collection.find({ email, isActive: true }).toArray();
+  } catch (error) {
+    console.error("Error getting job alerts:", error);
+    return [];
+  }
+}
+
+export async function getAllActiveJobAlerts(): Promise<JobAlert[]> {
+  try {
+    const collection = await getJobAlertsCollection();
+    return await collection.find({ isActive: true }).toArray();
+  } catch (error) {
+    console.error("Error getting all job alerts:", error);
+    return [];
+  }
+}
+
+export async function updateJobAlertLastSent(alertId: string): Promise<void> {
+  try {
+    const collection = await getJobAlertsCollection();
+    await collection.updateOne(
+      { id: alertId },
+      {
+        $set: {
+          lastSentAt: new Date(),
+          updatedAt: new Date(),
+        },
+        $inc: { totalSent: 1 },
+      }
+    );
+  } catch (error) {
+    console.error("Error updating job alert last sent:", error);
+  }
+}
+
+export async function deactivateJobAlert(alertId: string): Promise<void> {
+  try {
+    const collection = await getJobAlertsCollection();
+    await collection.updateOne(
+      { id: alertId },
+      {
+        $set: {
+          isActive: false,
+          updatedAt: new Date(),
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error deactivating job alert:", error);
+  }
+}
+
+export async function getJobAlertStats(): Promise<{
+  totalAlerts: number;
+  activeAlerts: number;
+  totalEmails: number;
+  recentAlerts: number;
+}> {
+  try {
+    const collection = await getJobAlertsCollection();
+    const totalAlerts = await collection.countDocuments();
+    const activeAlerts = await collection.countDocuments({ isActive: true });
+    const recentAlerts = await collection.countDocuments({
+      subscribedAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+    });
+
+    // Calculate total emails sent
+    const alerts = await collection.find({}).toArray();
+    const totalEmails = alerts.reduce(
+      (sum, alert) => sum + (alert.totalSent || 0),
+      0
+    );
+
+    return {
+      totalAlerts,
+      activeAlerts,
+      totalEmails,
+      recentAlerts,
+    };
+  } catch (error) {
+    console.error("Error getting job alert stats:", error);
+    return {
+      totalAlerts: 0,
+      activeAlerts: 0,
+      totalEmails: 0,
+      recentAlerts: 0,
+    };
+  }
+}
+
+export interface JobPosting {
+  _id?: string;
+  companyName: string;
+  companyWebsite?: string;
+  companyLogo?: string;
+  jobTitle: string;
+  location: string;
+  jobType: string;
+  experienceLevel: string;
+  salaryRange?: string;
+  jobDescription: string;
+  requiredSkills: string[];
+  benefits?: string;
+  applicationDeadline?: string;
+  contactEmail: string;
+  contactPhone?: string;
+  status: "draft" | "pending" | "active" | "expired" | "archived";
+  views: number;
+  applications: number;
+  createdAt: Date;
+  expiresAt: Date;
+  postedBy: string;
+}
+
+export async function getJobPostingsCollection() {
+  const db = await connectToDatabase();
+  return db.collection<JobPosting>("job-postings");
+}
+
+export async function addJobPosting(job: JobPosting): Promise<string> {
+  const collection = await getJobPostingsCollection();
+  const result = await collection.insertOne(job);
+  return result.insertedId.toString();
+}
+
+export async function getJobPostingById(
+  jobId: string
+): Promise<JobPosting | null> {
+  const collection = await getJobPostingsCollection();
+  return await collection.findOne({ _id: jobId });
+}
+
+export async function updateJobPosting(
+  jobId: string,
+  updates: Partial<JobPosting>
+): Promise<boolean> {
+  const collection = await getJobPostingsCollection();
+  const result = await collection.updateOne({ _id: jobId }, { $set: updates });
+  return result.modifiedCount > 0;
+}
+
+export async function getActiveJobPostings(): Promise<JobPosting[]> {
+  const collection = await getJobPostingsCollection();
+  return await collection
+    .find({
+      status: "active",
+      expiresAt: { $gt: new Date() },
+    })
+    .sort({ createdAt: -1 })
+    .toArray();
+}
+
+export async function getJobPostingsByEmail(
+  email: string
+): Promise<JobPosting[]> {
+  const collection = await getJobPostingsCollection();
+  return await collection
+    .find({ postedBy: email })
+    .sort({ createdAt: -1 })
+    .toArray();
+}
+
+export async function incrementJobViews(jobId: string): Promise<boolean> {
+  const collection = await getJobPostingsCollection();
+  const result = await collection.updateOne(
+    { _id: jobId },
+    { $inc: { views: 1 } }
+  );
+  return result.modifiedCount > 0;
+}
+
+export async function getJobPostingStats(): Promise<{
+  total: number;
+  active: number;
+  expired: number;
+  totalViews: number;
+  totalApplications: number;
+}> {
+  const collection = await getJobPostingsCollection();
+
+  const [total, active, expired, viewsResult, applicationsResult] =
+    await Promise.all([
+      collection.countDocuments({}),
+      collection.countDocuments({
+        status: "active",
+        expiresAt: { $gt: new Date() },
+      }),
+      collection.countDocuments({
+        expiresAt: { $lt: new Date() },
+      }),
+      collection
+        .aggregate([{ $group: { _id: null, totalViews: { $sum: "$views" } } }])
+        .toArray(),
+      collection
+        .aggregate([
+          {
+            $group: { _id: null, totalApplications: { $sum: "$applications" } },
+          },
+        ])
+        .toArray(),
+    ]);
+
+  return {
+    total,
+    active,
+    expired,
+    totalViews: viewsResult[0]?.totalViews || 0,
+    totalApplications: applicationsResult[0]?.totalApplications || 0,
+  };
 }

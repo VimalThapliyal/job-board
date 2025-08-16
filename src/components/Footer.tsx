@@ -3,14 +3,14 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {/* Brand */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <div className="col-span-1 sm:col-span-2">
+            <div className="flex items-center space-x-2 mb-3 sm:mb-4">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -23,19 +23,19 @@ export default function Footer() {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-bold">React Jobs</span>
+              <span className="text-lg sm:text-xl font-bold">React Jobs</span>
             </div>
-            <p className="text-gray-400 mb-4">
+            <p className="text-gray-400 mb-3 sm:mb-4 text-sm sm:text-base">
               Find the best React developer jobs from top companies. Apply
               directly and get hired faster.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3 sm:space-x-4">
               <a
                 href="#"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -49,7 +49,7 @@ export default function Footer() {
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -61,14 +61,22 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
                 >
                   Browse Jobs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/interview-questions"
+                  className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
+                >
+                  Interview Prep
                 </Link>
               </li>
             </ul>
@@ -76,12 +84,12 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Company</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/privacy"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
                 >
                   Privacy Policy
                 </Link>
@@ -89,7 +97,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/terms"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm sm:text-base"
                 >
                   Terms of Service
                 </Link>
@@ -98,19 +106,13 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-8 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © 2025 React Jobs. Designed and developed by{" "}
-              <a
-                href="https://www.linkedin.com/in/vimal-thapliyal/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Vimal Thapliyal
-              </a>
+        <div className="border-t border-gray-800 mt-8 sm:mt-12 pt-6 sm:pt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm text-center sm:text-left">
+              © 2024 React Jobs. All rights reserved.
+            </p>
+            <p className="text-gray-400 text-sm text-center sm:text-right mt-2 sm:mt-0">
+              Made with ❤️ for React developers
             </p>
           </div>
         </div>
